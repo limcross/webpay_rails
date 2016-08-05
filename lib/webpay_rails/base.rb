@@ -35,7 +35,7 @@ module WebpayRails
         })
 
         # sign document
-        document = self.sign_xml(req)
+        document = WebpayRails::Base.sign_xml(req)
         puts document
 
         begin
@@ -82,7 +82,7 @@ module WebpayRails
         })
 
         # sign request
-        document = self.sign_xml(req)
+        document = WebpayRails::Base.sign_xml(req)
 
         # begining get result
         begin
@@ -143,7 +143,7 @@ module WebpayRails
         })
 
         # sign body of request
-        document = self.sign_xml(req)
+        document = WebpayRails::Base.sign_xml(req)
 
         # acknowledge_transaction
         begin
@@ -164,37 +164,34 @@ module WebpayRails
       end
     end
 
-    module ClassMethods
-    private
-      def sign_xml(input_xml)
-        document = Nokogiri::XML(input_xml.body)
-        envelope = document.at_xpath('//env:Envelope')
-        envelope.prepend_child('<env:Header><wsse:Security xmlns:wsse=\'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\' wsse:mustUnderstand=\'1\'/></env:Header>')
-        xml = document.to_s
+    def sign_xml(input_xml)
+      document = Nokogiri::XML(input_xml.body)
+      envelope = document.at_xpath('//env:Envelope')
+      envelope.prepend_child('<env:Header><wsse:Security xmlns:wsse=\'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\' wsse:mustUnderstand=\'1\'/></env:Header>')
+      xml = document.to_s
 
-        signer = Signer.new(xml)
+      signer = Signer.new(xml)
 
-        signer.cert = OpenSSL::X509::Certificate.new(self.webpay_options[:public_cert])
-        signer.private_key = OpenSSL::PKey::RSA.new(self.webpay_options[:private_key])
+      signer.cert = OpenSSL::X509::Certificate.new(self.webpay_options[:public_cert])
+      signer.private_key = OpenSSL::PKey::RSA.new(self.webpay_options[:private_key])
 
-        signer.document.xpath('//soapenv:Body', { soapenv: 'http://schemas.xmlsoap.org/soap/envelope/' }).each do |node|
-          signer.digest!(node)
-        end
-
-        signer.sign!(:issuer_serial => true)
-        signed_xml = signer.to_xml
-
-        document = Nokogiri::XML(signed_xml)
-        x509data = document.at_xpath('//*[local-name()=\'X509Data\']')
-        new_data = x509data.clone()
-        new_data.set_attribute('xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#')
-
-        n = Nokogiri::XML::Node.new('wsse:SecurityTokenReference', document)
-        n.add_child(new_data)
-        x509data.add_next_sibling(n)
-
-        document
+      signer.document.xpath('//soapenv:Body', { soapenv: 'http://schemas.xmlsoap.org/soap/envelope/' }).each do |node|
+        signer.digest!(node)
       end
+
+      signer.sign!(:issuer_serial => true)
+      signed_xml = signer.to_xml
+
+      document = Nokogiri::XML(signed_xml)
+      x509data = document.at_xpath('//*[local-name()=\'X509Data\']')
+      new_data = x509data.clone()
+      new_data.set_attribute('xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#')
+
+      n = Nokogiri::XML::Node.new('wsse:SecurityTokenReference', document)
+      n.add_child(new_data)
+      x509data.add_next_sibling(n)
+
+      document
     end
   end
 end
