@@ -7,9 +7,7 @@ module WebpayRails
         class_attribute :webpay_options
 
         self.webpay_options = {
-          return_url: options.return_url,
-          final_url: options.final_url,
-          wsdl_path: 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl',
+          wsdl_path: options.wsdl_path || 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl',
           commerce_code: options.commerce_code,
           private_key: OpenSSL::PKey::RSA.new(options.private_key),
           public_cert: OpenSSL::X509::Certificate.new(options.public_cert),
@@ -20,14 +18,14 @@ module WebpayRails
         @client = Savon.client(wsdl: self.webpay_options[:wsdl_path])
       end
 
-      def init_transaction(amount, buyOrder, sessionId)
+      def init_transaction(amount, buyOrder, sessionId, return_url, final_url)
         req = @client.build_request(:init_transaction, message: {
           wsInitTransactionInput: {
             wSTransactionType: 'TR_NORMAL_WS',
             buyOrder: buyOrder,
             sessionId: sessionId,
-            returnURL: self.webpay_options[:return_url],
-            finalURL: self.webpay_options[:final_url],
+            returnURL: return_url,
+            finalURL: final_url,
             transactionDetails: {
               amount: amount,
               commerceCode: self.webpay_options[:commerce_code],
