@@ -2,7 +2,7 @@ module WebpayRails
   module Base
     extend ActiveSupport::Concern
 
-    included do
+    module InstanceMethods
       def init_transaction(amount, buy_order, session_id, return_url, final_url)
         request = self.client.build_request(:init_transaction, message: {
           wsInitTransactionInput: {
