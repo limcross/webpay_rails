@@ -3,5 +3,3 @@ sudo: false
 rvm:
   - 2.2.2
   - 2.3.0
-env:
-  - RSPEC_VERSION="~>3.4"
