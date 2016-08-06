@@ -96,8 +96,27 @@ describe WebpayRails do
   let(:order) { Order.new }
 
   describe WebpayRails::Transaction do
-    it { expect(order.init_transaction(amount, buy_order, session_id, result_url, final_url)).to be_kind_of(WebpayRails::Transaction) }
-    it { expect{order.init_transaction(amount, buy_order, session_id, '', '')}.to raise_error(WebpayRails::FailedInitTransaction) }
+    describe "when all is ok" do
+      let(:transaction) { order.init_transaction(amount, buy_order, session_id, result_url, final_url) }
+
+      it { expect(transaction).to be_kind_of(WebpayRails::Transaction) }
+
+      describe ".token" do
+        it { expect(transaction.token).not_to be_blank }
+      end
+
+      describe ".url" do
+        it { expect(transaction.url).not_to be_blank }
+      end
+
+      describe ".success?" do
+        it { expect(transaction.success?).to be_truthy }
+      end
+    end
+
+    describe "when not" do
+      it { expect{order.init_transaction(amount, buy_order, session_id, '', '')}.to raise_error(WebpayRails::FailedInitTransaction) }
+    end
   end
 
   describe WebpayRails::TransactionResult do
