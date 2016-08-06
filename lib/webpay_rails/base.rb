@@ -5,6 +5,7 @@ module WebpayRails
     included do
       def webpay_rails(options)
         class_attribute :webpay_options
+        class_attribute :client
 
         self.webpay_options = {
           wsdl_path: options.wsdl_path || 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl',
@@ -15,152 +16,99 @@ module WebpayRails
           environment: options.environment
         }
 
-        @client = Savon.client(wsdl: self.webpay_options[:wsdl_path])
+        self.client = Savon.client(wsdl: self.webpay_options[:wsdl_path])
       end
 
-      def init_transaction(amount, buyOrder, sessionId, return_url, final_url)
-        req = @client.build_request(:init_transaction, message: {
+      def init_transaction(amount, buy_order, session_id, return_url, final_url)
+        request = self.client.build_request(:init_transaction, message: {
           wsInitTransactionInput: {
             wSTransactionType: 'TR_NORMAL_WS',
-            buyOrder: buyOrder,
-            sessionId: sessionId,
+            buyOrder: buy_order,
+            sessionId: session_id,
             returnURL: return_url,
             finalURL: final_url,
             transactionDetails: {
               amount: amount,
               commerceCode: self.webpay_options[:commerce_code],
-              buyOrder: buyOrder
+              buyOrder: buy_order
             }
           }
         })
 
-        # sign document
-        document = WebpayRails::Base.sign_xml(req)
-        puts document
-
+        document = WebpayRails::Base.sign_xml(request)
         begin
-          response = @client.call(:init_transaction) do
-            xml document.to_xml(save_with: 0)
+          response = self.client.call(:init_transaction) do
+            xml(document.to_xml(save_with: 0))
           end
         rescue Exception, RuntimeError
-          raise
+          raise WebpayRails::FailedInitTransaction
         end
 
-        token = ''
-        response_document = Nokogiri::HTML(response.to_s)
-        response_document.xpath('//token').each do |token_value|
-          token = token_value.text
-        end
-
-        url = ''
-        response_document.xpath('//url').each do |url_value|
-          url = url_value.text
-        end
-
-        puts "token: #{token}"
-        puts "url: #{url}"
-
-        # verify cert
         tbk_cert = OpenSSL::X509::Certificate.new(self.webpay_options[:webpay_cert])
 
-        unless WebpayRails::Verifier.verify(response, tbk_cert)
-          puts "El Certificado es Invalido."
-        else
-          puts "El Certificado es Valido."
-        end
+        raise WebpayRails::InvalidCertificate unless WebpayRails::Verifier.verify(response, tbk_cert)
 
-        response_array = {
-          token: token.to_s,
-          url: url.to_s
-        }
+        response_document = Nokogiri::HTML(response.to_s)
+
+        WebpayRails::Transaction.new({
+          token: response_document.at_xpath('//token').text.to_s,
+          url: response_document.at_xpath('//url').text.to_s
+        })
       end
 
       def get_result(token)
-        # prepare sign
-        req = @client.build_request(:get_transaction_result, message: {
+        request = self.client.build_request(:get_transaction_result, message: {
           tokenInput: token
         })
 
-        # sign request
-        document = WebpayRails::Base.sign_xml(req)
-
-        # begining get result
+        document = WebpayRails::Base.sign_xml(request)
         begin
-          puts "Iniciando GetResult..."
-          response = @client.call(:get_transaction_result) do
-            xml document.to_xml(:save_with => 0)
+          response = self.client.call(:get_transaction_result) do
+            xml(document.to_xml(:save_with => 0))
           end
         rescue Exception, RuntimeError
-          raise
+          raise WebpayRails::FailedGetResult
         end
 
-        # we review that response is not nil
-        if response
-          puts "Respuesta getResult: #{response.to_s}"
-        else
-          puts 'Webservice Webpay responde con null'
-        end
+        raise WebpayRails::InvalidResultResponse unless response
 
-        token_obtenido = '' # FIXME ??
-        response_document = Nokogiri::HTML(response.to_s)
-
-        accountingdate 		= response_document.xpath('//accountingdate').text
-        buyorder 					= response_document.xpath('//buyorder').text
-        cardnumber 				= response_document.xpath('//cardnumber').text
-        amount 						= response_document.xpath('//amount').text
-        commercecode 			= response_document.xpath('//commercecode').text
-        authorizationcode	= response_document.xpath('//authorizationcode').text
-        paymenttypecode 	= response_document.xpath('//paymenttypecode').text
-        responsecode 			= response_document.xpath('//responsecode').text
-        transactiondate 	= response_document.xpath('//transactiondate').text
-        urlredirection 		= response_document.xpath('//urlredirection').text
-        vci 							= response_document.xpath('//vci').text
-
-        # acknowledge
         acknowledge_transaction(token)
 
-        {
-          accountingdate: 		 accountingdate.to_s,
-          buyorder: 					 buyorder.to_s,
-          cardnumber: 				 cardnumber.to_s,
-          amount: 						 amount.to_s,
-          commercecode: 			 commercecode.to_s,
-          authorizationcode:	 authorizationcode.to_s,
-          paymenttypecode: 	   paymenttypecode.to_s,
-          responsecode: 			 responsecode.to_s,
-          transactiondate: 	   transactiondate.to_s,
-          urlredirection: 		 urlredirection.to_s,
-          vci: 							   vci.to_s
-        }
+        response_document = Nokogiri::HTML(response.to_s)
+
+        WebpayRails::Result.new({
+          accounting_date: response_document.at_xpath('//accountingdate').text.to_s,
+          buy_order: response_document.at_xpath('//buyorder').text.to_s,
+          card_number: response_document.at_xpath('//cardnumber').text.to_s,
+          amount: response_document.at_xpath('//amount').text.to_s,
+          commerce_code: response_document.at_xpath('//commercecode').text.to_s,
+          authorization_code: response_document.at_xpath('//authorizationcode').text.to_s,
+          payment_type_code: response_document.at_xpath('//paymenttypecode').text.to_s,
+          response_code: response_document.at_xpath('//responsecode').text.to_s,
+          transaction_date: response_document.at_xpath('//transactiondate').text.to_s,
+          url_redirection: response_document.at_xpath('//urlredirection').text.to_s,
+          vci: response_document.at_xpath('//vci').text.to_s
+        })
       end
 
     private
 
       def acknowledge_transaction(token)
-        # prepare sign
-        req = @client.build_request(:acknowledge_transaction, message: {
+        request = self.client.build_request(:acknowledge_transaction, message: {
           tokenInput: token
         })
 
-        # sign body of request
-        document = WebpayRails::Base.sign_xml(req)
+        document = WebpayRails::Base.sign_xml(request)
 
-        # acknowledge_transaction
         begin
-          puts "Iniciando acknowledge_transaction..."
-          response = @client.call(:acknowledge_transaction, message: acknowledgeInput) do
+          response = self.client.call(:acknowledge_transaction, message: acknowledgeInput) do
             xml document.to_xml(:save_with => 0)
           end
         rescue Exception, RuntimeError
-          raise
+          raise WebpayRails::FailedAcknowledgeTransaction
         end
 
-        # we review that response is not nil
-        if response
-          puts "Respuesta acknowledge_transaction: #{response.to_s}"
-        else
-          puts 'Webservice Webpay responde con null'
-        end
+        raise WebpayRails::InvalidAcknowledgeResponse unless response
       end
     end
 

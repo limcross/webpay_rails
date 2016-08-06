@@ -1,13 +1,15 @@
 require 'active_support/concern'
 require 'webpay_rails/version'
+require 'webpay_rails/errors'
+require 'webpay_rails/verifier'
+require 'webpay_rails/transaction'
+require 'webpay_rails/result'
 
 module WebpayRails
   autoload :Base,     'webpay_rails/base'
-  autoload :Verifier, 'webpay_rails/verifier'
 
   def self.extended(base)
     base.include WebpayRails::Base
-    base.include WebpayRails::Verifier
 
     super
   end

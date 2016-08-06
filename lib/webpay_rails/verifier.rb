@@ -1,5 +1,5 @@
 module WebpayRails
-  module Verifier
+  class Verifier
     def verify(document, cert)
       document = Nokogiri::XML(document.to_s, &:noblanks)
       signed_info_node = document.at_xpath('/soap:Envelope/soap:Header/wsse:Security/ds:Signature/ds:SignedInfo', {
