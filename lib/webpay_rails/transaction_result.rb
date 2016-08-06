@@ -1,5 +1,5 @@
 module WebpayRails
-  class Result
+  class TransactionResult
     attr_reader :accounting_date, :buy_order, :card_number, :amount, :commerce_code,
       :authorization_code, :payment_type_code, :response_code, :transaction_date,
       :url_redirection, :vci

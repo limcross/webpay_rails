@@ -11,7 +11,7 @@ require 'webpay_rails/version'
 require 'webpay_rails/errors'
 require 'webpay_rails/verifier'
 require 'webpay_rails/transaction'
-require 'webpay_rails/result'
+require 'webpay_rails/transaction_result'
 
 module WebpayRails
   autoload :Base, 'webpay_rails/base'

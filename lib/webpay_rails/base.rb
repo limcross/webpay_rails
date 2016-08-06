@@ -19,30 +19,28 @@ module WebpayRails
           }
         })
 
-        document = sign_xml(request)
         begin
-          response = self.client.call(:init_transaction) { xml document.to_xml(save_with: 0) }
+          response = webpay_call(request, :init_transaction)
         rescue StandardError
           raise WebpayRails::FailedInitTransaction
         end
 
         raise WebpayRails::InvalidCertificate unless WebpayRails::Verifier.verify(response, self.webpay_options[:webpay_cert])
 
-        response_document = Nokogiri::HTML(response.to_s)
+        document = Nokogiri::HTML(response.to_s)
         WebpayRails::Transaction.new({
-          token: response_document.at_xpath('//token').text.to_s,
-          url: response_document.at_xpath('//url').text.to_s
+          token: document.at_xpath('//token').text.to_s,
+          url: document.at_xpath('//url').text.to_s
         })
       end
 
-      def get_result(token)
+      def transaction_result(token)
         request = self.client.build_request(:get_transaction_result, message: {
           tokenInput: token
         })
 
-        document = sign_xml(request)
         begin
-          response = self.client.call(:get_transaction_result) { xml document.to_xml(save_with: 0) }
+          response = webpay_call(request, :get_transaction_result)
         rescue StandardError
           raise WebpayRails::FailedGetResult
         end
@@ -51,20 +49,19 @@ module WebpayRails
 
         acknowledge_transaction(token)
 
-        response_document = Nokogiri::HTML(response.to_s)
-
-        WebpayRails::Result.new({
-          accounting_date: response_document.at_xpath('//accountingdate').text.to_s,
-          buy_order: response_document.at_xpath('//buyorder').text.to_s,
-          card_number: response_document.at_xpath('//cardnumber').text.to_s,
-          amount: response_document.at_xpath('//amount').text.to_s,
-          commerce_code: response_document.at_xpath('//commercecode').text.to_s,
-          authorization_code: response_document.at_xpath('//authorizationcode').text.to_s,
-          payment_type_code: response_document.at_xpath('//paymenttypecode').text.to_s,
-          response_code: response_document.at_xpath('//responsecode').text.to_s,
-          transaction_date: response_document.at_xpath('//transactiondate').text.to_s,
-          url_redirection: response_document.at_xpath('//urlredirection').text.to_s,
-          vci: response_document.at_xpath('//vci').text.to_s
+        document = Nokogiri::HTML(response.to_s)
+        WebpayRails::TransactionResult.new({
+          accounting_date: document.at_xpath('//accountingdate').text.to_s,
+          buy_order: document.at_xpath('//buyorder').text.to_s,
+          card_number: document.at_xpath('//cardnumber').text.to_s,
+          amount: document.at_xpath('//amount').text.to_s,
+          commerce_code: document.at_xpath('//commercecode').text.to_s,
+          authorization_code: document.at_xpath('//authorizationcode').text.to_s,
+          payment_type_code: document.at_xpath('//paymenttypecode').text.to_s,
+          response_code: document.at_xpath('//responsecode').text.to_s,
+          transaction_date: document.at_xpath('//transactiondate').text.to_s,
+          url_redirection: document.at_xpath('//urlredirection').text.to_s,
+          vci: document.at_xpath('//vci').text.to_s
         })
       end
 
@@ -75,11 +72,8 @@ module WebpayRails
           tokenInput: token
         })
 
-        document = sign_xml(request)
         begin
-          response = self.client.call(:acknowledge_transaction, message: {
-            tokenInput: token
-          }) { xml document.to_xml(save_with: 0) }
+          response = webpay_call(request, :acknowledge_transaction, message: { tokenInput: token })
         rescue StandardError
           raise WebpayRails::FailedAcknowledgeTransaction
         end
@@ -115,6 +109,11 @@ module WebpayRails
         x509data.add_next_sibling(n)
 
         document
+      end
+
+      def webpay_call(request, *params)
+        document = sign_xml(request)
+        self.client.call(*params) { xml document.to_xml(save_with: 0) }
       end
     end
 

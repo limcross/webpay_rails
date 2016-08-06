@@ -100,7 +100,7 @@ describe WebpayRails do
     it { expect{order.init_transaction(amount, buy_order, session_id, '', '')}.to raise_error(WebpayRails::FailedInitTransaction) }
   end
 
-  describe WebpayRails::Result do
+  describe WebpayRails::TransactionResult do
     pending "comming soon"
   end
 end
