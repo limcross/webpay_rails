@@ -5,11 +5,10 @@ module WebpayRails
     def initialize(params)
       @token = params[:token]
       @url = params[:url]
-      @valid_cert = params[:valid_cert]
     end
 
     def success?
-      @token
+      !@token.blank?
     end
   end
 end
