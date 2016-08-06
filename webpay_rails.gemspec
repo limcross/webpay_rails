@@ -22,10 +22,10 @@ Gem::Specification.new do |s|
   s.add_dependency 'signer', '~> 1.4.3'
   s.add_dependency 'savon', '~> 2'
   s.add_dependency 'nokogiri', '~> 1.6', '>= 1.6.7.2'
-  s.add_dependency 'activesupport', '>= 4.2.0'
+  s.add_dependency 'activesupport', '>= 3.0.0'
 
   s.add_development_dependency 'rspec', '~> 3.4'
-  s.add_development_dependency 'activerecord', '>= 4.2.0'
+  s.add_development_dependency 'activerecord', '>= 3.0.0'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'rake'
 
