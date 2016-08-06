@@ -1,4 +1,12 @@
 require 'active_support/concern'
+
+require 'signer'
+require 'savon'
+require 'nokogiri'
+require 'base64'
+require 'digest/sha1'
+require 'openssl'
+
 require 'webpay_rails/version'
 require 'webpay_rails/errors'
 require 'webpay_rails/verifier'
@@ -12,16 +20,5 @@ module WebpayRails
     base.include WebpayRails::Base
 
     super
-  end
-
-  begin
-    require 'signer'
-    require 'savon'
-
-    require 'nokogiri'
-    require 'base64'
-    require 'digest/sha1'
-    require 'openssl'
-  rescue LoadError
   end
 end

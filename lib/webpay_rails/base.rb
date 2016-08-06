@@ -21,19 +21,14 @@ module WebpayRails
 
         document = sign_xml(request)
         begin
-          response = self.client.call(:init_transaction) do
-            xml(document.to_xml(save_with: 0))
-          end
-        rescue Exception, RuntimeError
+          response = self.client.call(:init_transaction) { xml document.to_xml(save_with: 0) }
+        rescue StandardError
           raise WebpayRails::FailedInitTransaction
         end
 
-        tbk_cert = OpenSSL::X509::Certificate.new(self.webpay_options[:webpay_cert])
-
-        raise WebpayRails::InvalidCertificate unless WebpayRails::Verifier.verify(response, tbk_cert)
+        raise WebpayRails::InvalidCertificate unless WebpayRails::Verifier.verify(response, self.webpay_options[:webpay_cert])
 
         response_document = Nokogiri::HTML(response.to_s)
-
         WebpayRails::Transaction.new({
           token: response_document.at_xpath('//token').text.to_s,
           url: response_document.at_xpath('//url').text.to_s
@@ -47,10 +42,8 @@ module WebpayRails
 
         document = sign_xml(request)
         begin
-          response = self.client.call(:get_transaction_result) do
-            xml(document.to_xml(:save_with => 0))
-          end
-        rescue Exception, RuntimeError
+          response = self.client.call(:get_transaction_result) { xml document.to_xml(save_with: 0) }
+        rescue StandardError
           raise WebpayRails::FailedGetResult
         end
 
@@ -83,12 +76,11 @@ module WebpayRails
         })
 
         document = sign_xml(request)
-
         begin
-          response = self.client.call(:acknowledge_transaction, message: acknowledgeInput) do
-            xml document.to_xml(:save_with => 0)
-          end
-        rescue Exception, RuntimeError
+          response = self.client.call(:acknowledge_transaction, message: {
+            tokenInput: token
+          }) { xml document.to_xml(save_with: 0) }
+        rescue StandardError
           raise WebpayRails::FailedAcknowledgeTransaction
         end
 

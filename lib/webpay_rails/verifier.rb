@@ -12,7 +12,7 @@ module WebpayRails
       check_digest(document, signed_info_node) && check_signature(document, signed_info_node, cert)
     end
 
-  protected
+  private
 
     def self.check_digest(doc, signed_info_node)
       signed_info_node.xpath("//ds:Reference", ds: 'http://www.w3.org/2000/09/xmldsig#').each do |node|
