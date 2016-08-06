@@ -3,22 +3,6 @@ module WebpayRails
     extend ActiveSupport::Concern
 
     included do
-      def webpay_rails(options)
-        class_attribute :webpay_options
-        class_attribute :client
-
-        self.webpay_options = {
-          wsdl_path: options.wsdl_path || 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl',
-          commerce_code: options.commerce_code,
-          private_key: OpenSSL::PKey::RSA.new(options.private_key),
-          public_cert: OpenSSL::X509::Certificate.new(options.public_cert),
-          webpay_cert: OpenSSL::X509::Certificate.new(options.webpay_cert),
-          environment: options.environment
-        }
-
-        self.client = Savon.client(wsdl: self.webpay_options[:wsdl_path])
-      end
-
       def init_transaction(amount, buy_order, session_id, return_url, final_url)
         request = self.client.build_request(:init_transaction, message: {
           wsInitTransactionInput: {
@@ -35,7 +19,7 @@ module WebpayRails
           }
         })
 
-        document = WebpayRails::Base.sign_xml(request)
+        document = sign_xml(request)
         begin
           response = self.client.call(:init_transaction) do
             xml(document.to_xml(save_with: 0))
@@ -61,7 +45,7 @@ module WebpayRails
           tokenInput: token
         })
 
-        document = WebpayRails::Base.sign_xml(request)
+        document = sign_xml(request)
         begin
           response = self.client.call(:get_transaction_result) do
             xml(document.to_xml(:save_with => 0))
@@ -98,7 +82,7 @@ module WebpayRails
           tokenInput: token
         })
 
-        document = WebpayRails::Base.sign_xml(request)
+        document = sign_xml(request)
 
         begin
           response = self.client.call(:acknowledge_transaction, message: acknowledgeInput) do
@@ -110,36 +94,54 @@ module WebpayRails
 
         raise WebpayRails::InvalidAcknowledgeResponse unless response
       end
+
+      def sign_xml(input_xml)
+        document = Nokogiri::XML(input_xml.body)
+        envelope = document.at_xpath('//env:Envelope')
+        envelope.prepend_child('<env:Header><wsse:Security xmlns:wsse=\'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\' wsse:mustUnderstand=\'1\'/></env:Header>')
+        xml = document.to_s
+
+        signer = Signer.new(xml)
+
+        signer.cert = self.webpay_options[:public_cert]
+        signer.private_key = self.webpay_options[:private_key]
+
+        signer.document.xpath('//soapenv:Body', { soapenv: 'http://schemas.xmlsoap.org/soap/envelope/' }).each do |node|
+          signer.digest!(node)
+        end
+
+        signer.sign!(:issuer_serial => true)
+        signed_xml = signer.to_xml
+
+        document = Nokogiri::XML(signed_xml)
+        x509data = document.at_xpath('//*[local-name()=\'X509Data\']')
+        new_data = x509data.clone()
+        new_data.set_attribute('xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#')
+
+        n = Nokogiri::XML::Node.new('wsse:SecurityTokenReference', document)
+        n.add_child(new_data)
+        x509data.add_next_sibling(n)
+
+        document
+      end
     end
 
-    def sign_xml(input_xml)
-      document = Nokogiri::XML(input_xml.body)
-      envelope = document.at_xpath('//env:Envelope')
-      envelope.prepend_child('<env:Header><wsse:Security xmlns:wsse=\'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\' wsse:mustUnderstand=\'1\'/></env:Header>')
-      xml = document.to_s
+    module ClassMethods
+      def webpay_rails(options)
+        class_attribute :webpay_options
+        class_attribute :client
 
-      signer = Signer.new(xml)
+        self.webpay_options = {
+          wsdl_path: options[:wsdl_path] || 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl',
+          commerce_code: options[:commerce_code],
+          private_key: OpenSSL::PKey::RSA.new(options[:private_key]),
+          public_cert: OpenSSL::X509::Certificate.new(options[:public_cert]),
+          webpay_cert: OpenSSL::X509::Certificate.new(options[:webpay_cert]),
+          environment: options[:environment]
+        }
 
-      signer.cert = OpenSSL::X509::Certificate.new(self.webpay_options[:public_cert])
-      signer.private_key = OpenSSL::PKey::RSA.new(self.webpay_options[:private_key])
-
-      signer.document.xpath('//soapenv:Body', { soapenv: 'http://schemas.xmlsoap.org/soap/envelope/' }).each do |node|
-        signer.digest!(node)
+        self.client = Savon.client(wsdl: self.webpay_options[:wsdl_path])
       end
-
-      signer.sign!(:issuer_serial => true)
-      signed_xml = signer.to_xml
-
-      document = Nokogiri::XML(signed_xml)
-      x509data = document.at_xpath('//*[local-name()=\'X509Data\']')
-      new_data = x509data.clone()
-      new_data.set_attribute('xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#')
-
-      n = Nokogiri::XML::Node.new('wsse:SecurityTokenReference', document)
-      n.add_child(new_data)
-      x509data.add_next_sibling(n)
-
-      document
     end
   end
 end

@@ -6,7 +6,7 @@ require 'webpay_rails/transaction'
 require 'webpay_rails/result'
 
 module WebpayRails
-  autoload :Base,     'webpay_rails/base'
+  autoload :Base, 'webpay_rails/base'
 
   def self.extended(base)
     base.include WebpayRails::Base
