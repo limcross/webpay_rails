@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.platform      = Gem::Platform::RUBY
   s.name          = "webpay_rails"
   s.version       = WebpayRails::VERSION
-  s.summary       = "WebpayRails facilitates the integration of Transbank Webpay for Rails applications."
+  s.summary       = "WebpayRails is an easy solution for integrate Transbank Webpay in Rails applications."
   s.description   = s.summary
   s.authors       = ["Sebastián Orellana"]
   s.email         = ["limcross@gmail.com"]
