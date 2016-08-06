@@ -17,5 +17,9 @@ module WebpayRails
       @url_redirection = params[:url_redirection]
       @vci = params[:vci]
     end
+
+    def approved?
+      @response_code == 0
+    end
   end
 end
