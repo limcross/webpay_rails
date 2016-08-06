@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.platform      = Gem::Platform::RUBY
   s.name          = "webpay_rails"
   s.version       = WebpayRails::VERSION
-  s.summary       = "This software was created for easy integration of Rails applications with Transbank Webpay solution."
+  s.summary       = "WebpayRails facilitates the integration of Transbank Webpay for Rails applications."
   s.description   = s.summary
   s.authors       = ["Sebastián Orellana"]
   s.email         = ["limcross@gmail.com"]
@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'nokogiri', '~> 1.6', '>= 1.6.7.2'
   s.add_dependency 'activesupport', '>= 4.2.0'
 
-  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rspec', '~> 3.4'
   s.add_development_dependency 'activerecord', '>= 4.2.0'
   s.add_development_dependency 'sqlite3'
 end
