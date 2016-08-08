@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/limcross/webpay_rails.svg?branch=master)](https://travis-ci.org/limcross/webpay_rails)
 [![Code Climate](https://codeclimate.com/github/limcross/webpay_rails/badges/gpa.svg)](https://codeclimate.com/github/limcross/webpay_rails)
+[![Gem Version](https://badge.fury.io/rb/webpay_rails.svg)](https://badge.fury.io/rb/webpay_rails)
 
 WebpayRails is an easy solution for integrate Transbank Webpay in Rails applications.
 
