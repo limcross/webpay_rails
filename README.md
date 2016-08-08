@@ -23,6 +23,7 @@ class Order < ActiveRecord::Base
   extend WebpayRails
 
   webpay_rails({
+    commerce_code: 123456789,
     private_key: '-----BEGIN RSA PRIVATE KEY-----
 ...
 -----END RSA PRIVATE KEY-----',
@@ -32,12 +33,10 @@ class Order < ActiveRecord::Base
     webpay_cert: '-----BEGIN CERTIFICATE-----
 ...
 -----END CERTIFICATE-----',
-    commerce_code: 123456789
+    environment: :integration
   })
 end
 ```
-
-Optionally you can define the 'wsdl_path' to specify that you want to use.
 
 Obviously all these values should not be defined directly in the model. It is strongly recommended to use environment variables for this ([dotenv](https://github.com/bkeepers/dotenv)).
 
@@ -51,9 +50,9 @@ First we need to initialize an transaction, like below:
 @transaction = Order.init_transaction(amount, buy_order, session_id, return_url, final_url)
 ```
 
-Where `amount` is an _integer_ that define the amount receivable, `buy_order` is an _intenger_ that define the order number of the buy, `session_id` is an _string_ that define a local variable that will be returned as part of the result of the transaction, `return_url` and `final_url` are an _string_ for the redirections.
+Where `amount` is an __integer__ that define the amount of the transaction (_obviously_), `buy_order` is an __intenger__ that define the order number of the buy, `session_id` is an __string__ that define a local variable that will be returned as part of the result of the transaction, `return_url` and `final_url` are a __string__ for the redirections.
 
-This method return a `Transaction` object, that contain a `redirection url` and `token` for redirect the customer through POST method, like below.
+This method return a `Transaction` object, that contain a redirection `url` and `token` for redirect the customer through POST method, like below.
 
 ```erb
 <% if @transaction.success? %>
@@ -64,6 +63,48 @@ This method return a `Transaction` object, that contain a `redirection url` and 
 <% end %>
 ```
 
-Once Webpay displays the form of payment and authorization of the bank, the customer will send back to the `return_url` with a token indicating the transaction. (If the customer cancels the transaction is directly returned to the `final_url`)
+Once Webpay displays the form of payment and authorization of the bank, the customer will send back through __POST__ method to the `return_url` with a `token_ws`. (If the customer cancels the transaction is directly returned to the `final_url` in the same way).
 
 #### Getting the result of a transaction
+
+When Webpay send a __POST__ to `return_url` with `token_ws`, we need to ask for the transaction result, like below.
+
+```ruby
+@result = Order.transaction_result(params[:token_ws])
+```
+
+This method return a `TransactionResult` object, that contain an `accounting_date`, `buy_order`, `card_number`, `amount`, `commerce_code`, `authorization_code`, `payment_type_code`, `response_code`, `transaction_date`, `url_redirection` and `vci`.
+
+At this point we have confirmed the transaction with Transbank, performing the operation `acknowledge_transaction` by means of `transaction_result`.
+
+Now we need to send back the customer to `url_redirection` with `token_ws` in the same way we did earlier in the initialization of the transaction.
+
+#### Ending a transaction
+
+When Webpay send customer to `final_url`, we are done. Finally the transaction has ended. :clap:
+
+## Contributing
+Any contribution is welcome. Personally I prefer to use English to do documentation and describe commits, however there is no problem if you make your comments and issues in Spanish.
+
+### Reporting issues
+
+Please try to answer the following questions in your bug report:
+
+- What did you do?
+- What did you expect to happen?
+- What happened instead?
+
+Make sure to include as much relevant information as possible. Ruby version,
+WebpayRails version, OS version and any stack traces you have are very valuable.
+
+### Pull Requests
+
+- __Add tests!__ Your patch won't be accepted if it doesn't have tests.
+
+- __Document any change in behaviour__. Make sure the README and any  relevant documentation are kept up-to-date.
+
+- __Create topic branches__. Please don't ask us to pull from your master branch.
+
+- __One pull request per feature__. If you want to do more than one thing, send multiple pull requests.
+
+- __Send coherent history__. Make sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please squash them before sending them to us.

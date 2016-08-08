@@ -4,18 +4,18 @@ module WebpayRails
       :authorization_code, :payment_type_code, :response_code, :transaction_date,
       :url_redirection, :vci
 
-    def initialize(params)
-      @accounting_date = params[:accounting_date]
-      @buy_order = params[:buy_order]
-      @card_number = params[:card_number]
-      @amount = params[:amount]
-      @commerce_code = params[:commerce_code]
-      @authorization_code = params[:authorization_code]
-      @payment_type_code = params[:payment_type_code]
-      @response_code = params[:response_code]
-      @transaction_date = params[:transaction_date]
-      @url_redirection = params[:url_redirection]
-      @vci = params[:vci]
+    def initialize(args)
+      @accounting_date = args[:accounting_date]
+      @buy_order = args[:buy_order]
+      @card_number = args[:card_number]
+      @amount = args[:amount]
+      @commerce_code = args[:commerce_code]
+      @authorization_code = args[:authorization_code]
+      @payment_type_code = args[:payment_type_code]
+      @response_code = args[:response_code]
+      @transaction_date = args[:transaction_date]
+      @url_redirection = args[:url_redirection]
+      @vci = args[:vci]
     end
 
     def approved?

@@ -15,6 +15,7 @@ class Order < ActiveRecord::Base
   extend WebpayRails
 
   webpay_rails({
+    commerce_code: 597020000541,
     private_key: '-----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEA0ClVcH8RC1u+KpCPUnzYSIcmyXI87REsBkQzaA1QJe4w/B7g
 6KvKV9DaqfnNhMvd9/ypmGf0RDQPhlBbGlzymKz1xh0lQBD+9MZrg8Ju8/d1k0pI
@@ -81,7 +82,6 @@ CpEvgcRIv/OeIi6Jbuu3NrPdGPwzYkzlOQnmgio5RGb6GSs+OQ0mUWZ9J1+YtdZc+xTga0x7nsCT
 2QR2bX/W2H6ktRcLsgBK9mq7lE36p3q6c9DtZJE+xfA4NGCYWM9hd8pbusnoNO7AFxJZOuuvLZI7
 JvD7YLhPvCYKry7N6x3l
 -----END CERTIFICATE-----',
-    commerce_code: 597020000541,
     environment: :integration
   })
 end
@@ -93,11 +93,9 @@ describe WebpayRails do
   let(:result_url) { 'http://localhost:3000/tbknormal?option=result' }
   let(:final_url) { 'http://localhost:3000/tbknormal?option=final' }
 
-  let(:order) { Order.new }
-
   describe WebpayRails::Transaction do
     describe "when all is ok" do
-      let(:transaction) { order.init_transaction(amount, buy_order, session_id, result_url, final_url) }
+      let(:transaction) { Order.init_transaction(amount, buy_order, session_id, result_url, final_url) }
 
       it { expect(transaction).to be_kind_of(WebpayRails::Transaction) }
 
@@ -115,7 +113,7 @@ describe WebpayRails do
     end
 
     describe "when not" do
-      it { expect{order.init_transaction(amount, buy_order, session_id, '', '')}.to raise_error(WebpayRails::FailedInitTransaction) }
+      it { expect{Order.init_transaction(amount, buy_order, session_id, '', '')}.to raise_error(WebpayRails::FailedInitTransaction) }
     end
   end
 

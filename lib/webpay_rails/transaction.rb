@@ -2,9 +2,9 @@ module WebpayRails
   class Transaction
     attr_reader :token, :url
 
-    def initialize(params)
-      @token = params[:token]
-      @url = params[:url]
+    def initialize(args)
+      @token = args[:token]
+      @url = args[:url]
     end
 
     def success?

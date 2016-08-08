@@ -5,4 +5,5 @@ module WebpayRails
   class InvalidResultResponse < Error; end
   class FailedAcknowledgeTransaction < Error; end
   class InvalidAcknowledgeResponse < Error; end
+  class InvalidEnvironment < Error; end
 end

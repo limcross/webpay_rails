@@ -2,30 +2,25 @@ module WebpayRails
   module Base
     extend ActiveSupport::Concern
 
-    included do
-      def init_transaction(amount, buy_order, session_id, return_url, final_url)
-        request = self.client.build_request(:init_transaction, message: {
-          wsInitTransactionInput: {
-            wSTransactionType: 'TR_NORMAL_WS',
-            buyOrder: buy_order,
-            sessionId: session_id,
-            returnURL: return_url,
-            finalURL: final_url,
-            transactionDetails: {
-              amount: amount,
-              commerceCode: self.webpay_options[:commerce_code],
-              buyOrder: buy_order
-            }
-          }
-        })
+    module ClassMethods
+      def webpay_rails(options)
+        class_attribute :commerce_code, :webpay_cert, :environment, :soap, instance_accessor: false
 
+        self.commerce_code = options[:commerce_code]
+        self.webpay_cert = OpenSSL::X509::Certificate.new(options[:webpay_cert])
+        self.environment = options[:environment]
+
+        self.soap = WebpayRails::Soap.new(options)
+      end
+
+      def init_transaction(amount, buy_order, session_id, return_url, final_url)
         begin
-          response = webpay_call(request, :init_transaction)
+          response = soap.init_transaction(commerce_code, amount, buy_order, session_id, return_url, final_url)
         rescue StandardError
           raise WebpayRails::FailedInitTransaction
         end
 
-        raise WebpayRails::InvalidCertificate unless WebpayRails::Verifier.verify(response, self.webpay_options[:webpay_cert])
+        raise WebpayRails::InvalidCertificate unless WebpayRails::Verifier.verify(response, webpay_cert)
 
         document = Nokogiri::HTML(response.to_s)
         WebpayRails::Transaction.new({
@@ -35,12 +30,8 @@ module WebpayRails
       end
 
       def transaction_result(token)
-        request = self.client.build_request(:get_transaction_result, message: {
-          tokenInput: token
-        })
-
         begin
-          response = webpay_call(request, :get_transaction_result)
+          response = soap.get_transaction_result(token)
         rescue StandardError
           raise WebpayRails::FailedGetResult
         end
@@ -65,73 +56,14 @@ module WebpayRails
         })
       end
 
-    private
-
       def acknowledge_transaction(token)
-        request = self.client.build_request(:acknowledge_transaction, message: {
-          tokenInput: token
-        })
-
         begin
-          response = webpay_call(request, :acknowledge_transaction, message: { tokenInput: token })
+          response = soap.acknowledge_transaction(token)
         rescue StandardError
           raise WebpayRails::FailedAcknowledgeTransaction
         end
 
         raise WebpayRails::InvalidAcknowledgeResponse unless response
-      end
-
-      def sign_xml(input_xml)
-        document = Nokogiri::XML(input_xml.body)
-        envelope = document.at_xpath('//env:Envelope')
-        envelope.prepend_child('<env:Header><wsse:Security xmlns:wsse=\'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\' wsse:mustUnderstand=\'1\'/></env:Header>')
-        xml = document.to_s
-
-        signer = Signer.new(xml)
-
-        signer.cert = self.webpay_options[:public_cert]
-        signer.private_key = self.webpay_options[:private_key]
-
-        signer.document.xpath('//soapenv:Body', { soapenv: 'http://schemas.xmlsoap.org/soap/envelope/' }).each do |node|
-          signer.digest!(node)
-        end
-
-        signer.sign!(:issuer_serial => true)
-        signed_xml = signer.to_xml
-
-        document = Nokogiri::XML(signed_xml)
-        x509data = document.at_xpath('//*[local-name()=\'X509Data\']')
-        new_data = x509data.clone()
-        new_data.set_attribute('xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#')
-
-        n = Nokogiri::XML::Node.new('wsse:SecurityTokenReference', document)
-        n.add_child(new_data)
-        x509data.add_next_sibling(n)
-
-        document
-      end
-
-      def webpay_call(request, *params)
-        document = sign_xml(request)
-        self.client.call(*params) { xml document.to_xml(save_with: 0) }
-      end
-    end
-
-    module ClassMethods
-      def webpay_rails(options)
-        class_attribute :webpay_options
-        class_attribute :client
-
-        self.webpay_options = {
-          wsdl_path: options[:wsdl_path] || 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl',
-          commerce_code: options[:commerce_code],
-          private_key: OpenSSL::PKey::RSA.new(options[:private_key]),
-          public_cert: OpenSSL::X509::Certificate.new(options[:public_cert]),
-          webpay_cert: OpenSSL::X509::Certificate.new(options[:webpay_cert]),
-          environment: options[:environment]
-        }
-
-        self.client = Savon.client(wsdl: self.webpay_options[:wsdl_path])
       end
     end
   end
