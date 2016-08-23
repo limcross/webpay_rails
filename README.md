@@ -6,6 +6,8 @@
 
 WebpayRails is an easy solution for integrate Transbank Webpay in Rails applications.
 
+_This gem (including certificates used in tests) was originally based on the SDK for Ruby (distributed under the **open source license**) available in www.transbankdevelopers.cl_
+
 ## Getting started
 You can add it to your `Gemfile`:
 
