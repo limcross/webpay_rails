@@ -19,7 +19,7 @@ module WebpayRails
     end
 
     def approved?
-      @response_code == 0
+      @response_code.to_i == 0
     end
   end
 end
