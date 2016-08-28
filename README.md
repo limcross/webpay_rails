@@ -36,7 +36,8 @@ class Order < ActiveRecord::Base
     webpay_cert: '-----BEGIN CERTIFICATE-----
 ...
 -----END CERTIFICATE-----',
-    environment: :integration
+    environment: :integration,
+    log: Rails.env.development?
   })
 end
 ```

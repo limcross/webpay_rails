@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'savon', '~> 2'
   s.add_dependency 'nokogiri', '~> 1.6', '>= 1.6.7.2'
   s.add_dependency 'activesupport', '>= 3.2'
+  s.add_dependency 'railties', '>= 4.1.0', '< 5.1'
 
   s.add_development_dependency 'rspec', '~> 3.4'
   s.add_development_dependency 'activerecord', '>= 3.2'

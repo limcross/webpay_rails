@@ -7,7 +7,7 @@ module WebpayRails
       @public_cert = OpenSSL::X509::Certificate.new(args[:public_cert])
       @environment = args[:environment]
 
-      self.class.client(wsdl: wsdl_path)
+      self.class.client(wsdl: wsdl_path, log: args[:log], logger: WebpayRails.logger)
     end
 
     def init_transaction(commerce_code, amount, buy_order, session_id, return_url, final_url)
