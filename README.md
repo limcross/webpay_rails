@@ -61,8 +61,8 @@ This method return a `Transaction` object, that contain a redirection `url` and 
 <% if @transaction.success? %>
   <%= form_tag(@transaction.url, method: "post") do %>
     <%= hidden_field_tag(:token_ws, @transaction.token) %>
-    <%= submit_tag("Pagar con Webpay")
-  <%= end %>
+    <%= submit_tag("Pagar con Webpay") %>
+  <% end %>
 <% end %>
 ```
 
