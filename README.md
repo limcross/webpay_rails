@@ -81,7 +81,7 @@ This method return a `TransactionResult` object, that contain an `accounting_dat
 
 At this point we have confirmed the transaction with Transbank, performing the operation `acknowledge_transaction` by means of `transaction_result`.
 
-Now we need to send back the customer to `url_redirection` with `token_ws` in the same way we did earlier in the initialization of the transaction.
+Now we need to send back the customer to `url_redirection` with `token_ws` through __GET__ method.
 
 #### Ending a transaction
 
