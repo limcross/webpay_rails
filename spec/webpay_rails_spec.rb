@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'active_record'
 
 silence_warnings do
   ActiveRecord::Migration.verbose = false
@@ -91,12 +90,12 @@ describe WebpayRails do
   let(:amount) { 1000 }
   let(:buy_order) { rand(1111111..9999999) }
   let(:session_id) { 'aj2h4kj2' }
-  let(:result_url) { 'http://localhost:3000/tbknormal?option=result' }
+  let(:return_url) { 'http://localhost:3000/tbknormal?option=return' }
   let(:final_url) { 'http://localhost:3000/tbknormal?option=final' }
 
   describe WebpayRails::Transaction do
     describe "when all is ok" do
-      let(:transaction) { Order.init_transaction(amount, buy_order, session_id, result_url, final_url) }
+      let(:transaction) { Order.init_transaction(amount, buy_order, session_id, return_url, final_url) }
 
       it { expect(transaction).to be_kind_of(WebpayRails::Transaction) }
 
@@ -115,6 +114,7 @@ describe WebpayRails do
 
     describe "when not" do
       it { expect{Order.init_transaction(amount, buy_order, session_id, '', '')}.to raise_error(WebpayRails::FailedInitTransaction) }
+      it { expect{Order.init_transaction(0, buy_order, session_id, return_url, final_url)}.to raise_error(WebpayRails::FailedInitTransaction) }
     end
   end
 
