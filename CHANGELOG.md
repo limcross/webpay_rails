@@ -2,6 +2,7 @@
 
 #### enhancements
 * add rails logger support for savon
+* add missing attributes on transanction result (`session_id`, `card_expiration_date`, `shares_number`)
 
 ### 1.0.1 - 2016-08-26
 

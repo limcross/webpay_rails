@@ -1,25 +1,35 @@
 module WebpayRails
   class TransactionResult
-    attr_reader :accounting_date, :buy_order, :card_number, :amount, :commerce_code,
-      :authorization_code, :payment_type_code, :response_code, :transaction_date,
-      :url_redirection, :vci
 
-    def initialize(args)
-      @accounting_date = args[:accounting_date]
-      @buy_order = args[:buy_order]
-      @card_number = args[:card_number]
-      @amount = args[:amount]
-      @commerce_code = args[:commerce_code]
-      @authorization_code = args[:authorization_code]
-      @payment_type_code = args[:payment_type_code]
-      @response_code = args[:response_code]
-      @transaction_date = args[:transaction_date]
-      @url_redirection = args[:url_redirection]
-      @vci = args[:vci]
+    def self.attr_list
+      [
+        :buy_order, :session_id, :accounting_date, :transaction_date, :vci,
+        :url_redirection,
+
+        # card details
+        :card_number, :card_expiration_date,
+
+        # transaction details
+        :authorization_code, :payment_type_code, :response_code,
+        :amount, :shares_number, :commerce_code
+      ]
+    end
+
+    def initialize(document)
+      self.class.attr_list.each do |k|
+        v = document.at_xpath("//#{k.to_s.tr('_', '')}")
+        send("#{k}=", v.text.to_s) unless v.nil?
+      end
     end
 
     def approved?
-      @response_code.to_i == 0
+      response_code.to_i == 0
     end
+
+    attr_reader *attr_list
+
+  private
+
+    attr_writer *attr_list
   end
 end

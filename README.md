@@ -77,7 +77,7 @@ When Webpay send a __POST__ to `return_url` with `token_ws`, we need to ask for 
 @result = Order.transaction_result(params[:token_ws])
 ```
 
-This method return a `TransactionResult` object, that contain an `accounting_date`, `buy_order`, `card_number`, `amount`, `commerce_code`, `authorization_code`, `payment_type_code`, `response_code`, `transaction_date`, `url_redirection` and `vci`.
+This method return a `TransactionResult` object, that contain an `buy_order`, `session_id`, `accounting_date`, `transaction_date`, `vci`, `url_redirection`, `card_number`, `card_expiration_date`, `authorization_code`, `payment_type_code`, `response_code`, `amount`, `shares_number` and `commerce_code`.
 
 At this point we have confirmed the transaction with Transbank, performing the operation `acknowledge_transaction` by means of `transaction_result`.
 
