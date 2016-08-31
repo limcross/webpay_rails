@@ -1,4 +1,4 @@
-### Unreleased
+### 1.0.2 - 2016-08-30
 
 #### enhancements
 * add rails logger support for savon
