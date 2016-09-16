@@ -1,5 +1,7 @@
 ### Unreleased
 
+### 1.0.3 - 2016-09-15
+
 #### bug fixes
 * add missing error
 
