@@ -6,4 +6,5 @@ module WebpayRails
   class FailedAcknowledgeTransaction < Error; end
   class InvalidAcknowledgeResponse < Error; end
   class InvalidEnvironment < Error; end
+  class InvalidCertificate < Error; end
 end

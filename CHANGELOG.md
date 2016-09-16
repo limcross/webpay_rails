@@ -1,3 +1,8 @@
+### Unreleased
+
+#### bug fixes
+* add missing error
+
 ### 1.0.2 - 2016-08-30
 
 #### enhancements
