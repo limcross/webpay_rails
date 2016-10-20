@@ -52,6 +52,21 @@ module WebpayRails
 
         raise WebpayRails::InvalidAcknowledgeResponse if response.blank?
       end
+
+      def nullify(authorization_code, authorize_amount, buy_order, nullify_amount)
+        begin
+          response = soap.nullify(authorization_code, authorize_amount,
+                                  buy_order, commerce_code, nullify_amount)
+        rescue StandardError
+          raise WebpayRails::FailedNullify
+        end
+
+        unless WebpayRails::Verifier.verify(response, webpay_cert)
+          raise WebpayRails::InvalidCertificate
+        end
+
+        WebpayRails::Nullified.new(Nokogiri::HTML(response.to_s))
+      end
     end
   end
 end

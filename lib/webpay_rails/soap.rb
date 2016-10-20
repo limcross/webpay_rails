@@ -39,6 +39,15 @@ module WebpayRails
       call(request, :acknowledge_transaction)
     end
 
+    def nullify(authorization_code, authorize_amount, buy_order, commerce_code, nullify_amount)
+      request = client.build_request(:nullify, message: {
+        authorizationCode: authorization_code, authorizeAmount: authorize_amount,
+        buyOrder: buy_order, commerceCode: commerce_code, nullifyAmount: nullify_amount
+      })
+
+      call(request, :nullify)
+    end
+
     private
 
     def call(request, operation)

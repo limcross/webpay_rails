@@ -1,4 +1,5 @@
 ### Unreleased
+* add support for nullify method
 
 ### 1.0.3 - 2016-09-15
 

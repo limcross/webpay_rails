@@ -7,4 +7,5 @@ module WebpayRails
   class InvalidAcknowledgeResponse < Error; end
   class InvalidEnvironment < Error; end
   class InvalidCertificate < Error; end
+  class FailedNullify < Error; end
 end
