@@ -23,13 +23,13 @@ module WebpayRails
     end
 
     def approved?
-      response_code.to_i == 0
+      response_code.to_i.zero?
     end
 
-    attr_reader *attr_list
+    attr_reader(*attr_list)
 
-  private
+    private
 
-    attr_writer *attr_list
+    attr_writer(*attr_list)
   end
 end

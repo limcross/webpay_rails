@@ -7,21 +7,17 @@ module WebpayRails
       @public_cert = OpenSSL::X509::Certificate.new(args[:public_cert])
       @environment = args[:environment]
 
-      self.class.client(wsdl: wsdl_path, log: args[:log], logger: WebpayRails.logger)
+      self.class.client(wsdl: wsdl_path, log: args[:log],
+                        logger: WebpayRails.logger)
     end
 
     def init_transaction(commerce_code, amount, buy_order, session_id, return_url, final_url)
       request = client.build_request(:init_transaction, message: {
         wsInitTransactionInput: {
-          wSTransactionType: 'TR_NORMAL_WS',
-          buyOrder: buy_order,
-          sessionId: session_id,
-          returnURL: return_url,
-          finalURL: final_url,
+          wSTransactionType: 'TR_NORMAL_WS', buyOrder: buy_order,
+          sessionId: session_id, returnURL: return_url, finalURL: final_url,
           transactionDetails: {
-            amount: amount,
-            commerceCode: commerce_code,
-            buyOrder: buy_order
+            amount: amount, commerceCode: commerce_code, buyOrder: buy_order
           }
         }
       })
@@ -30,22 +26,20 @@ module WebpayRails
     end
 
     def get_transaction_result(token)
-      request = client.build_request(:get_transaction_result, message: {
-        tokenInput: token
-      })
+      request = client.build_request(:get_transaction_result,
+                                     message: { tokenInput: token })
 
       call(request, :get_transaction_result)
     end
 
     def acknowledge_transaction(token)
-      request = client.build_request(:acknowledge_transaction, message: {
-        tokenInput: token
-      })
+      request = client.build_request(:acknowledge_transaction,
+                                     message: { tokenInput: token })
 
       call(request, :acknowledge_transaction)
     end
 
-  private
+    private
 
     def call(request, operation)
       signed_document = sign_xml(request)
@@ -75,7 +69,7 @@ module WebpayRails
 
       document = Nokogiri::XML(signed_xml)
       x509data = document.at_xpath('//*[local-name()=\'X509Data\']')
-      new_data = x509data.clone()
+      new_data = x509data.clone
       new_data.set_attribute('xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#')
 
       n = Nokogiri::XML::Node.new('wsse:SecurityTokenReference', document)
