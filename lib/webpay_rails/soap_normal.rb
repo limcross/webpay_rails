@@ -1,15 +1,8 @@
 module WebpayRails
   class SoapNormal < Soap
-    def init_transaction(commerce_code, amount, buy_order, session_id, return_url, final_url)
-      request = client.build_request(:init_transaction, message: {
-        wsInitTransactionInput: {
-          wSTransactionType: 'TR_NORMAL_WS', buyOrder: buy_order,
-          sessionId: session_id, returnURL: return_url, finalURL: final_url,
-          transactionDetails: {
-            amount: amount, commerceCode: commerce_code, buyOrder: buy_order
-          }
-        }
-      })
+    def init_transaction(args)
+      request = client.build_request(:init_transaction,
+                                     message: init_transaction_message(args))
 
       call(request, :init_transaction)
     end
@@ -28,28 +21,32 @@ module WebpayRails
       call(request, :acknowledge_transaction)
     end
 
-    def nullify(authorization_code, authorize_amount, buy_order, commerce_code, nullify_amount)
-      request = client.build_request(:nullify, message: {
-        authorizationCode: authorization_code, authorizeAmount: authorize_amount,
-        buyOrder: buy_order, commerceCode: commerce_code, nullifyAmount: nullify_amount
-      })
-
-      call(request, :nullify)
-    end
-
     private
 
     def wsdl_path
       case @environment
       when :production
         'https://webpay3g.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl'
-      when :certification
+      when :certification, :integration
         'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl'
-      when :integration
-        'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl'
-      else
-        raise WebpayRails::InvalidEnvironment
       end
+    end
+
+    def init_transaction_message(args)
+      {
+        wsInitTransactionInput: {
+          wSTransactionType: 'TR_NORMAL_WS',
+          buyOrder: args[:buy_order],
+          sessionId: args[:session_id],
+          returnURL: args[:return_url],
+          finalURL: args[:final_url],
+          transactionDetails: {
+            amount: args[:amount],
+            commerceCode: args[:commerce_code],
+            buyOrder: args[:buy_order]
+          }
+        }
+      }
     end
   end
 end

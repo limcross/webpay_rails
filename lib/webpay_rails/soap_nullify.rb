@@ -1,10 +1,7 @@
 module WebpayRails
   class SoapNullify < Soap
-    def nullify(authorization_code, authorize_amount, buy_order, commerce_code, nullify_amount)
-      request = client.build_request(:nullify, message: {
-        authorizationCode: authorization_code, authorizeAmount: authorize_amount,
-        buyOrder: buy_order, commerceCode: commerce_code, nullifyAmount: nullify_amount
-      })
+    def nullify(args)
+      request = client.build_request(:nullify, message: nullify_message(args))
 
       call(request, :nullify)
     end
@@ -15,13 +12,19 @@ module WebpayRails
       case @environment
       when :production
         'https://webpay3g.transbank.cl/WSWebpayTransaction/cxf/WSCommerceIntegrationService?wsdl'
-      when :certification
+      when :certification, :integration
         'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSCommerceIntegrationService?wsdl'
-      when :integration
-        'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSCommerceIntegrationService?wsdl'
-      else
-        raise WebpayRails::InvalidEnvironment
       end
+    end
+
+    def nullify_message(args)
+      {
+        authorizationCode: args[:authorization_code],
+        authorizeAmount: args[:authorize_amount],
+        buyOrder: args[:buy_order],
+        commerceCode: args[:commerce_code],
+        nullifyAmount: args[:nullify_amount]
+      }
     end
   end
 end

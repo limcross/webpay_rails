@@ -10,6 +10,7 @@ require 'openssl'
 
 require 'webpay_rails/version'
 require 'webpay_rails/errors'
+require 'webpay_rails/vault'
 require 'webpay_rails/soap'
 require 'webpay_rails/soap_normal'
 require 'webpay_rails/soap_nullify'

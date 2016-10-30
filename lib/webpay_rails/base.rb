@@ -3,27 +3,27 @@ module WebpayRails
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def webpay_rails(options)
-        class_attribute :commerce_code, :webpay_cert, :environment,
-                        :soap_normal, :soap_nullify, instance_accessor: false
+      def webpay_rails(args)
+        class_attribute :commerce_code, :vault, :soap_normal, :soap_nullify,
+                        instance_accessor: false
 
-        self.commerce_code = options[:commerce_code]
-        self.webpay_cert = OpenSSL::X509::Certificate.new(options[:webpay_cert])
-        self.environment = options[:environment]
+        raise WebpayRails::MissingCommerceCode unless args[:commerce_code]
 
-        self.soap_normal = WebpayRails::SoapNormal.new(options)
-        self.soap_nullify = WebpayRails::SoapNullify.new(options)
+        self.commerce_code = args[:commerce_code]
+        self.vault = args[:vault] = WebpayRails::Vault.new(args)
+        self.soap_normal = WebpayRails::SoapNormal.new(args)
+        self.soap_nullify = WebpayRails::SoapNullify.new(args)
       end
 
-      def init_transaction(amount, buy_order, session_id, return_url, final_url)
+      def init_transaction(args)
         begin
-          response = soap_normal.init_transaction(commerce_code, amount, buy_order,
-                                                  session_id, return_url, final_url)
-        rescue StandardError
-          raise WebpayRails::FailedInitTransaction
+          response = soap_normal
+                     .init_transaction(args.merge(commerce_code: commerce_code))
+        rescue Savon::SOAPFault => error
+          raise WebpayRails::FailedInitTransaction, error.to_s
         end
 
-        unless WebpayRails::Verifier.verify(response, webpay_cert)
+        unless WebpayRails::Verifier.verify(response, vault.webpay_cert)
           raise WebpayRails::InvalidCertificate
         end
 
@@ -33,8 +33,8 @@ module WebpayRails
       def transaction_result(token)
         begin
           response = soap_normal.get_transaction_result(token)
-        rescue StandardError
-          raise WebpayRails::FailedGetResult
+        rescue Savon::SOAPFault => error
+          raise WebpayRails::FailedGetResult, error.to_s
         end
 
         raise WebpayRails::InvalidResultResponse if response.blank?
@@ -47,22 +47,21 @@ module WebpayRails
       def acknowledge_transaction(token)
         begin
           response = soap_normal.acknowledge_transaction(token)
-        rescue StandardError
-          raise WebpayRails::FailedAcknowledgeTransaction
+        rescue Savon::SOAPFault => error
+          raise WebpayRails::FailedAcknowledgeTransaction, error.to_s
         end
 
         raise WebpayRails::InvalidAcknowledgeResponse if response.blank?
       end
 
-      def nullify(authorization_code, authorize_amount, buy_order, nullify_amount)
+      def nullify(args)
         begin
-          response = soap_nullify.nullify(authorization_code, authorize_amount,
-                                          buy_order, commerce_code, nullify_amount)
-        rescue StandardError
-          raise WebpayRails::FailedNullify
+          response = soap_nullify.nullify(args)
+        rescue Savon::SOAPFault => error
+          raise WebpayRails::FailedNullify, error.to_s
         end
 
-        unless WebpayRails::Verifier.verify(response, webpay_cert)
+        unless WebpayRails::Verifier.verify(response, vault.webpay_cert)
           raise WebpayRails::InvalidCertificate
         end
 

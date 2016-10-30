@@ -1,6 +1,5 @@
 module WebpayRails
   class TransactionResult
-
     def self.attr_list
       [
         :buy_order, :session_id, :accounting_date, :transaction_date, :vci,

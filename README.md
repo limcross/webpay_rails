@@ -25,7 +25,7 @@ After that, extend the model to `WebpayRails` and add `webpay_rails` to this, li
 class Order < ActiveRecord::Base
   extend WebpayRails
 
-  webpay_rails({
+  webpay_rails(
     commerce_code: 123456789,
     private_key: '-----BEGIN RSA PRIVATE KEY-----
 ...
@@ -38,7 +38,7 @@ class Order < ActiveRecord::Base
 -----END CERTIFICATE-----',
     environment: :integration,
     log: Rails.env.development?
-  })
+  )
 end
 ```
 

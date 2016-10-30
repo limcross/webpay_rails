@@ -3,11 +3,14 @@ module WebpayRails
     extend Savon::Model
 
     def initialize(args)
-      @private_key = OpenSSL::PKey::RSA.new(args[:private_key])
-      @public_cert = OpenSSL::X509::Certificate.new(args[:public_cert])
-      @environment = args[:environment]
+      @vault = args[:vault]
+      @environment = args[:environment] || :integration
 
-      self.class.client(wsdl: wsdl_path, log: args[:log],
+      unless valid_environments.include? @environment
+        raise WebpayRails::InvalidEnvironment
+      end
+
+      self.class.client(wsdl: wsdl_path, log: args[:log] || false,
                         logger: WebpayRails.logger)
     end
 
@@ -29,8 +32,8 @@ module WebpayRails
 
       signer = Signer.new(xml)
 
-      signer.cert = @public_cert
-      signer.private_key = @private_key
+      signer.cert = @vault.public_cert
+      signer.private_key = @vault.private_key
 
       signer.document.xpath('//soapenv:Body', { soapenv: 'http://schemas.xmlsoap.org/soap/envelope/' }).each do |node|
         signer.digest!(node)
@@ -49,6 +52,10 @@ module WebpayRails
       x509data.add_next_sibling(n)
 
       document
+    end
+
+    def valid_environments
+      [:production, :certification, :integration]
     end
   end
 end
