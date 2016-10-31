@@ -66,7 +66,7 @@ module WebpayRails
           raise WebpayRails::InvalidCertificate
         end
 
-        WebpayRails::Nullified.new(Nokogiri::HTML(response.to_s))
+        WebpayRails::TransactionNullified.new(Nokogiri::HTML(response.to_s))
       end
     end
   end

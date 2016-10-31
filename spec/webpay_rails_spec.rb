@@ -151,7 +151,7 @@ describe WebpayRails do
     pending 'comming soon'
   end
 
-  describe WebpayRails::Nullified do
+  describe WebpayRails::TransactionNullified do
     pending 'comming soon'
   end
 end

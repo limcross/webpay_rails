@@ -1,5 +1,5 @@
 module WebpayRails
-  class Nullified
+  class TransactionNullified
     def self.attr_list
       [:token, :authorization_code, :authorization_date, :balance,
        :nullified_amount]
