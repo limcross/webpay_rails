@@ -19,10 +19,6 @@ module WebpayRails
           raise WebpayRails::FailedInitTransaction, error.to_s
         end
 
-        unless WebpayRails::Verifier.verify(response, vault.webpay_cert)
-          raise WebpayRails::InvalidCertificate
-        end
-
         WebpayRails::Transaction.new(Nokogiri::HTML(response.to_s))
       end
 
@@ -55,10 +51,6 @@ module WebpayRails
           response = soap_nullify.nullify(args)
         rescue Savon::SOAPFault => error
           raise WebpayRails::FailedNullify, error.to_s
-        end
-
-        unless WebpayRails::Verifier.verify(response, vault.webpay_cert)
-          raise WebpayRails::InvalidCertificate
         end
 
         WebpayRails::TransactionNullified.new(Nokogiri::HTML(response.to_s))

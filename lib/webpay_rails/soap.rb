@@ -22,9 +22,15 @@ module WebpayRails
     def call(request, operation)
       signed_document = sign_xml(request)
 
-      client.call(operation) do
+      response = client.call(operation) do
         xml signed_document.to_xml(save_with: 0)
       end
+
+      unless WebpayRails::Verifier.verify(response, @vault.webpay_cert)
+        raise WebpayRails::InvalidCertificate
+      end
+
+      response
     end
 
     def sign_xml(input_xml)

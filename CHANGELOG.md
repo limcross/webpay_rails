@@ -1,5 +1,8 @@
 ### Unreleased
 
+#### bug fixes
+* fix response verification
+
 #### enhancements
 * add support for nullify method
 * raise detailed errors when rescued from Savon::SOAPFault
