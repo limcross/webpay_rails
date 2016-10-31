@@ -56,7 +56,8 @@ module WebpayRails
 
       def nullify(args)
         begin
-          response = soap_nullify.nullify(args)
+          response = soap_nullify
+                     .nullify(args.merge(commerce_code: commerce_code))
         rescue Savon::SOAPFault => error
           raise WebpayRails::FailedNullify, error.to_s
         end
