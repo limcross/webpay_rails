@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec', '~> 3.5'
   s.add_development_dependency 'rspec-rails', '~> 3.5'
   s.add_development_dependency 'capybara', '~> 2.10', '>= 2.10.1'
+  s.add_development_dependency 'poltergeist', '~> 1.11'
   s.add_development_dependency 'selenium-webdriver', '~> 3.0'
   s.add_development_dependency 'combustion', '~> 0.5.5'
   s.add_development_dependency 'activerecord', '~> 5.0', '>= 5.0.0.1'

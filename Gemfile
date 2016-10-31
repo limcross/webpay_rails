@@ -12,3 +12,5 @@ gemspec
 
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
+
+gem 'phantomjs', group: :development, require: 'phantomjs/poltergeist'

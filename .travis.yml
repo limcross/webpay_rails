@@ -4,5 +4,7 @@ cache: bundler
 rvm:
   - 2.2.2
   - 2.3.0
+env:
+  - CAPYBARA_DRIVER=poltergeist
 notifications:
   email: false
