@@ -17,6 +17,7 @@ require 'webpay_rails/soap_nullify'
 require 'webpay_rails/verifier'
 require 'webpay_rails/transaction'
 require 'webpay_rails/transaction_result'
+require 'webpay_rails/nullified'
 require 'webpay_rails/railites'
 
 module WebpayRails
