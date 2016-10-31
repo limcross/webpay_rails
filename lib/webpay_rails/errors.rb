@@ -2,36 +2,47 @@ module WebpayRails
   # Generic WebpayRails exception class.
   class WebpayRailsError < StandardError; end
 
-  # Raise when the commerce code has not been defined
+  # Raise when the commerce code has not been defined.
   class MissingCommerceCode < WebpayRailsError; end
-  # Raise when the environment is not valid
+  # Raise when the environment is not valid.
   class InvalidEnvironment < WebpayRailsError; end
 
-  # Raise when the response cant be verify with the webpay cert
-  class InvalidCertificate < WebpayRailsError; end
+  # Generic Soap exception class.
+  class SoapError < WebpayRailsError
+    def initialize(action, error)
+      super("Attempted to #{action} but #{error}")
+    end
+  end
 
-  # Raise when the init_transaction method has failed
-  class FailedInitTransaction < WebpayRailsError; end
+  # Raise when the SOAP request has failed.
+  class RequestFailed < SoapError
+    def initialize(action, error)
+      super(action, "SOAP responds with a #{error.http.code} " \
+                    "status code: #{error}")
+    end
+  end
+  # Raise when the SOAP response of a request is blank.
+  class InvalidResponse < SoapError
+    def initialize(action)
+      super(action, 'SOAP response is blank')
+    end
+  end
+  # Raise when the SOAP response cannot be verify with the webpay cert.
+  class InvalidCertificate < SoapError
+    def initialize(action)
+      super(action, 'the response was not signed with the correct certificate')
+    end
+  end
 
-  # Raise when the transaction_result method has failed
-  class FailedGetResult < WebpayRailsError; end
-  # Raise when the transaction_result method result in a blank response
-  class InvalidResultResponse < WebpayRailsError; end
+  # Generic Vault exception class.
+  class VaultError < WebpayRailsError; end
 
-  # Raise when the acknowledge_transaction method has failed
-  class FailedAcknowledgeTransaction < WebpayRailsError; end
-  # Raise when the acknowledge_transaction method result in a blank response
-  class InvalidAcknowledgeResponse < WebpayRailsError; end
-
-  # Raise when the nullify method has failed
-  class FailedNullify < WebpayRailsError; end
-
-  # Raise when vault cant load the file
-  class FileNotFound < WebpayRailsError; end
-  # Raise when private key has not been defined
-  class MissingPrivateKey < WebpayRailsError; end
-  # Raise when public certificate has not been defined
-  class MissingPublicCertificate < WebpayRailsError; end
-  # Raise when webpay certificate has not been defined
-  class MissingWebpayCertificate < WebpayRailsError; end
+  # Raise when vault cant load the file.
+  class FileNotFound < VaultError; end
+  # Raise when private key has not been defined.
+  class MissingPrivateKey < VaultError; end
+  # Raise when public certificate has not been defined.
+  class MissingPublicCertificate < VaultError; end
+  # Raise when webpay certificate has not been defined.
+  class MissingWebpayCertificate < VaultError; end
 end

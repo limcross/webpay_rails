@@ -26,11 +26,9 @@ module WebpayRails
         xml signed_document.to_xml(save_with: 0)
       end
 
-      unless WebpayRails::Verifier.verify(response, @vault.webpay_cert)
-        raise WebpayRails::InvalidCertificate
-      end
-
-      response
+      verify_response(response, operation)
+    rescue Savon::SOAPFault => error
+      raise WebpayRails::RequestFailed.new(operation, error)
     end
 
     def sign_xml(input_xml)
@@ -61,6 +59,16 @@ module WebpayRails
       x509data.add_next_sibling(n)
 
       document
+    end
+
+    def verify_response(response, operation)
+      raise(WebpayRails::InvalidResponse, operation) if response.blank?
+
+      if WebpayRails::Verifier.verify(response, @vault.webpay_cert)
+        response
+      else
+        raise WebpayRails::InvalidCertificate, operation
+      end
     end
 
     def valid_environments

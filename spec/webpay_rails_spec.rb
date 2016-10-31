@@ -141,8 +141,8 @@ describe WebpayRails do
     end
 
     describe 'when not' do
-      it { expect { Order.init_transaction(init_transaction_params.merge(return_url: '', final_url: '')) }.to raise_error(WebpayRails::FailedInitTransaction) }
-      it { expect { Order.init_transaction(init_transaction_params.merge(amount: 0)) }.to raise_error(WebpayRails::FailedInitTransaction) }
+      it { expect { Order.init_transaction(init_transaction_params.merge(return_url: '', final_url: '')) }.to raise_error(WebpayRails::RequestFailed) }
+      it { expect { Order.init_transaction(init_transaction_params.merge(amount: 0)) }.to raise_error(WebpayRails::RequestFailed) }
       it { expect { OrderWithInvalidWebpayCertificate.init_transaction(init_transaction_params) }.to raise_error(WebpayRails::InvalidCertificate) }
     end
   end

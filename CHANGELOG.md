@@ -5,10 +5,11 @@
 
 #### enhancements
 * add support for nullify method
-* raise detailed errors when rescued from Savon::SOAPFault
+* raise detailed execptions when rescued from Savon::SOAPFault
 * group certificates and private keys on Vault
-* improve errors when missing certificates, private_keys or commerce_code, and when set an invalid environment
+* improve execptions when missing certificates, private_keys or commerce_code, and when set an invalid environment
 * add support for certificates and private key as a files
+* replace specific exceptions by generic exceptions with more detailed explanations
 
 ### 1.0.3 - 2016-09-15
 

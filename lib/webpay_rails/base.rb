@@ -43,7 +43,7 @@ module WebpayRails
 
       # Initializes a transaction
       # Returns a WebpayRails::Transaction if successfully initialised.
-      # If fault a WebpayRails::FailedInitTransaction exception is raised.
+      # If fault a WebpayRails::RequestFailed exception is raised.
       # If the SOAP response cant be verified a WebpayRails::InvalidCertificate
       # exception is raised.
       #
@@ -62,40 +62,30 @@ module WebpayRails
       #   An string that define the url that Webpay redirect after they show
       #   the webpay invoice, or cancel the transaction from Webpay.
       def init_transaction(args)
-        begin
-          response = soap_normal.init_transaction(args)
-        rescue Savon::SOAPFault => error
-          raise WebpayRails::FailedInitTransaction, error.to_s
-        end
+        response = soap_normal.init_transaction(args)
 
-        WebpayRails::Transaction.new(Nokogiri::HTML(response.to_s))
+        WebpayRails::Transaction.new(response)
       end
 
       # Retrieves the result of a transaction
       # Returns a WebpayRails::TransactionResult if successfully get a response.
-      # If fault a WebpayRails::FailedGetResult exception is raised.
+      # If fault a WebpayRails::RequestFailed exception is raised.
       # If the SOAP response cant be verified a WebpayRails::InvalidCertificate
       # exception is raised.
       #
       # === Arguments
       # [:token]
       #   An string that responds Webpay when redirect to +return_url+.
-      def transaction_result(token)
-        begin
-          response = soap_normal.get_transaction_result(token)
-        rescue Savon::SOAPFault => error
-          raise WebpayRails::FailedGetResult, error.to_s
-        end
-
-        raise WebpayRails::InvalidResultResponse if response.blank?
+      def transaction_result(args)
+        response = soap_normal.get_transaction_result(args)
 
         acknowledge_transaction(token)
 
-        WebpayRails::TransactionResult.new(Nokogiri::HTML(response.to_s))
+        WebpayRails::TransactionResult.new(response)
       end
 
       # Reports the correct reception of the result of the transaction
-      # If fault a WebpayRails::InvalidAcknowledgeResponse exception is raised.
+      # If fault a WebpayRails::RequestFailed exception is raised.
       # If the SOAP response cant be verified a WebpayRails::InvalidCertificate
       # exception is raised.
       #
@@ -105,19 +95,13 @@ module WebpayRails
       #
       # NOTE: It is not necessary to use this method because it is consumed by
       # +transaction_result+.
-      def acknowledge_transaction(token)
-        begin
-          response = soap_normal.acknowledge_transaction(token)
-        rescue Savon::SOAPFault => error
-          raise WebpayRails::FailedAcknowledgeTransaction, error.to_s
-        end
-
-        raise WebpayRails::InvalidAcknowledgeResponse if response.blank?
+      def acknowledge_transaction(args)
+        soap_normal.acknowledge_transaction(args)
       end
 
       # Nullify a transaction
       # Returns a WebpayRails::TransactionNullified if successfully initialised.
-      # If fault a WebpayRails::FailedNullify exception is raised.
+      # If fault a WebpayRails::RequestFailed exception is raised.
       # If the SOAP response cant be verified a WebpayRails::InvalidCertificate
       # exception is raised.
       #
@@ -132,13 +116,9 @@ module WebpayRails
       # [:nullify_amount]
       #   An intenger that define the amount to be nullified on the transaction.
       def nullify(args)
-        begin
-          response = soap_nullify.nullify(args)
-        rescue Savon::SOAPFault => error
-          raise WebpayRails::FailedNullify, error.to_s
-        end
+        response = soap_nullify.nullify(args)
 
-        WebpayRails::TransactionNullified.new(Nokogiri::HTML(response.to_s))
+        WebpayRails::TransactionNullified.new(response)
       end
     end
   end
