@@ -7,6 +7,9 @@ module WebpayRails
   # Raise when the environment is not valid
   class InvalidEnvironment < WebpayRailsError; end
 
+  # Raise when the response cant be verify with the webpay cert
+  class InvalidCertificate < WebpayRailsError; end
+
   # Raise when the init_transaction method has failed
   class FailedInitTransaction < WebpayRailsError; end
 
@@ -19,8 +22,6 @@ module WebpayRails
   class FailedAcknowledgeTransaction < WebpayRailsError; end
   # Raise when the acknowledge_transaction method result in a blank response
   class InvalidAcknowledgeResponse < WebpayRailsError; end
-  # Raise when the response cant ve verify with the webpay cert
-  class InvalidCertificate < WebpayRailsError; end
 
   # Raise when the nullify method has failed
   class FailedNullify < WebpayRailsError; end
