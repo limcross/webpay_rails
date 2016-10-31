@@ -23,7 +23,6 @@ Run the bundle command to install it.
 ### Configuring models
 After that, extend the model to `WebpayRails` and add `webpay_rails` to this, like below.
 
-
 ```ruby
 class Order < ActiveRecord::Base
   extend WebpayRails
@@ -63,7 +62,7 @@ First we need to initialize an transaction, like below:
 @transaction = Order.init_transaction(amount: amount, buy_order: buy_order, session_id: session_id, return_url: return_url, final_url: final_url)
 ```
 
-Where `amount` is an __integer__ that define the amount of the transaction (_obviously_), `buy_order` is an __intenger__ that define the order number of the buy, `session_id` is an __string__ that define a local variable that will be returned as part of the result of the transaction, `return_url` and `final_url` are a __string__ for the redirections.
+Where `amount` is an __integer__ that define the amount of the transaction (_obviously_), `buy_order` is an __string__ that define the order number of the buy, `session_id` is an __string__ that define a local variable that will be returned as part of the result of the transaction, `return_url` and `final_url` are a __string__ for the redirections.
 
 This method return a `Transaction` object, that contain a redirection `url` and `token` for redirect the customer through POST method, like below.
 
