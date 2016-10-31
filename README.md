@@ -9,6 +9,9 @@ WebpayRails is an easy solution for integrate Transbank Webpay in Rails applicat
 _This gem (including certificates used in tests) was originally based on the SDK for Ruby (distributed under the **open source license**) available in www.transbankdevelopers.cl_
 
 ## Getting started
+
+__This README is only valid for the *master* branch, click [here](https://github.com/limcross/webpay_rails/blob/v1.0.3/README.md) for see the latest released version.__
+
 You can add it to your `Gemfile`:
 
 ```ruby
@@ -42,6 +45,12 @@ class Order < ActiveRecord::Base
 end
 ```
 
+As you can see for `private_key`, `public_cert`, and `webpay_cert`, the content of the files is entered, without prejudice to the above you can also indicate the absolute path to these files.
+
+The default `environment` is `:integration`, and the valid environments are `:integration`, `:certification` and `:production`. Depending on the environment is assigned the wsdl path.
+
+The `log` is very useful when generating the evidence of integration, and is enabled by default.
+
 Obviously all these values should not be defined directly in the model. It is strongly recommended to use environment variables for this ([dotenv](https://github.com/bkeepers/dotenv)).
 
 ### Using WebpayRails
@@ -51,7 +60,7 @@ Obviously all these values should not be defined directly in the model. It is st
 First we need to initialize an transaction, like below:
 
 ```ruby
-@transaction = Order.init_transaction(amount, buy_order, session_id, return_url, final_url)
+@transaction = Order.init_transaction(amount: amount, buy_order: buy_order, session_id: session_id, return_url: return_url, final_url: final_url)
 ```
 
 Where `amount` is an __integer__ that define the amount of the transaction (_obviously_), `buy_order` is an __intenger__ that define the order number of the buy, `session_id` is an __string__ that define a local variable that will be returned as part of the result of the transaction, `return_url` and `final_url` are a __string__ for the redirections.
@@ -60,7 +69,7 @@ This method return a `Transaction` object, that contain a redirection `url` and 
 
 ```erb
 <% if @transaction.success? %>
-  <%= form_tag(@transaction.url, method: "post") do %>
+  <%= form_tag(@transaction.url, method: :post) do %>
     <%= hidden_field_tag(:token_ws, @transaction.token) %>
     <%= submit_tag("Pagar con Webpay") %>
   <% end %>
@@ -86,6 +95,21 @@ Now we need to send back the customer to `url_redirection` with `token_ws` throu
 #### Ending a transaction
 
 When Webpay send customer to `final_url`, we are done. Finally the transaction has ended. :clap:
+
+#### Nullify a transaction
+
+To cancel a transaction we must use the method described below.
+
+```ruby
+@transaction = Order.nullify(authorization_code: authorization_code, authorize_amount: authorize_amount, buy_order: buy_order, nullify_amount: nullify_amount)
+```
+
+Where `authorization_code`, `authorize_amount`, `buy_order`, are known and corresponds to the transaction to be canceled, and `nullify_amount` it corresponds to the amount to be canceled.
+
+This method return a `TransactionNullified` object, that contain an `token`, `authorization_code`, `authorization_date`, `balance` and
+ `nullified_amount`.
+
+Note that you can only make a single cancellation, whether total or partial.
 
 ## Contributing
 Any contribution is welcome. Personally I prefer to use English to do documentation and describe commits, however there is no problem if you make your comments and issues in Spanish.
