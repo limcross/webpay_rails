@@ -7,16 +7,16 @@ module WebpayRails
       call(request, :init_transaction)
     end
 
-    def get_transaction_result(token)
+    def get_transaction_result(args)
       request = client.build_request(:get_transaction_result,
-                                     message: { tokenInput: token })
+                                     message: { tokenInput: args[:token] })
 
       call(request, :get_transaction_result)
     end
 
-    def acknowledge_transaction(token)
+    def acknowledge_transaction(args)
       request = client.build_request(:acknowledge_transaction,
-                                     message: { tokenInput: token })
+                                     message: { tokenInput: args[:token] })
 
       call(request, :acknowledge_transaction)
     end

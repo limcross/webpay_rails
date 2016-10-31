@@ -82,7 +82,7 @@ Once Webpay displays the form of payment and authorization of the bank, the cust
 When Webpay send a __POST__ to `return_url` with `token_ws`, we need to ask for the transaction result, like below.
 
 ```ruby
-@result = Order.transaction_result(params[:token_ws])
+@result = Order.transaction_result(token: params[:token_ws])
 ```
 
 This method return a `TransactionResult` object, that contain an `buy_order`, `session_id`, `accounting_date`, `transaction_date`, `vci`, `url_redirection`, `card_number`, `card_expiration_date`, `authorization_code`, `payment_type_code`, `response_code`, `amount`, `shares_number` and `commerce_code`.
