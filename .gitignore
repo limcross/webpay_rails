@@ -1,5 +1,7 @@
-test/dummy/log/*
-test/dummy/tmp/*
+spec/internal/log/*
+spec/internal/tmp/*
+spec/internal/db/*.sqlite3
+spec/internal/db/log/*.log
 *~
 coverage/*
 *.sqlite3

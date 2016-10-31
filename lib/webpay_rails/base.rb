@@ -82,7 +82,7 @@ module WebpayRails
       def transaction_result(args)
         response = soap_normal.get_transaction_result(args)
 
-        acknowledge_transaction(args[:token]) if args[:ack] != false
+        acknowledge_transaction(args) if args[:ack] != false
 
         WebpayRails::TransactionResult.new(response)
       end

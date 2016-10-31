@@ -1,0 +1,6 @@
+<h1>Form</h1>
+
+<%= form_for @order do |f| %>
+  <%= f.number_field :amount %>
+  <%= f.submit 'Purchase' %>
+<% end %>

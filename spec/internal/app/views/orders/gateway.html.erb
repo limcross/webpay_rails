@@ -1,0 +1,8 @@
+<%= form_tag(@url, method: @method, style: 'display: none;', id: 'gatewayForm') do %>
+  <%= hidden_field_tag(:token_ws, @token) %>
+  <%= submit_tag("Continuar a webpay") %>
+<% end %>
+
+<script>
+  document.getElementById('gatewayForm').submit();
+</script>
