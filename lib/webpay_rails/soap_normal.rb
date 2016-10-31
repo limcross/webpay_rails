@@ -42,7 +42,7 @@ module WebpayRails
           finalURL: args[:final_url],
           transactionDetails: {
             amount: args[:amount],
-            commerceCode: args[:commerce_code],
+            commerceCode: @commerce_code,
             buyOrder: args[:buy_order]
           }
         }

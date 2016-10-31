@@ -5,6 +5,9 @@ module WebpayRails
     def initialize(args)
       @vault = args[:vault]
       @environment = args[:environment] || :integration
+      @commerce_code = args[:commerce_code]
+
+      raise WebpayRails::MissingCommerceCode unless @commerce_code
 
       unless valid_environments.include? @environment
         raise WebpayRails::InvalidEnvironment

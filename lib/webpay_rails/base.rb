@@ -4,12 +4,9 @@ module WebpayRails
 
     module ClassMethods
       def webpay_rails(args)
-        class_attribute :commerce_code, :vault, :soap_normal, :soap_nullify,
+        class_attribute :vault, :soap_normal, :soap_nullify,
                         instance_accessor: false
 
-        raise WebpayRails::MissingCommerceCode unless args[:commerce_code]
-
-        self.commerce_code = args[:commerce_code]
         self.vault = args[:vault] = WebpayRails::Vault.new(args)
         self.soap_normal = WebpayRails::SoapNormal.new(args)
         self.soap_nullify = WebpayRails::SoapNullify.new(args)
@@ -17,8 +14,7 @@ module WebpayRails
 
       def init_transaction(args)
         begin
-          response = soap_normal
-                     .init_transaction(args.merge(commerce_code: commerce_code))
+          response = soap_normal.init_transaction(args)
         rescue Savon::SOAPFault => error
           raise WebpayRails::FailedInitTransaction, error.to_s
         end
@@ -56,8 +52,7 @@ module WebpayRails
 
       def nullify(args)
         begin
-          response = soap_nullify
-                     .nullify(args.merge(commerce_code: commerce_code))
+          response = soap_nullify.nullify(args)
         rescue Savon::SOAPFault => error
           raise WebpayRails::FailedNullify, error.to_s
         end

@@ -22,7 +22,7 @@ module WebpayRails
         authorizationCode: args[:authorization_code],
         authorizeAmount: args[:authorize_amount],
         buyOrder: args[:buy_order],
-        commerceCode: args[:commerce_code],
+        commerceCode: @commerce_code,
         nullifyAmount: args[:nullify_amount]
       }
     end
