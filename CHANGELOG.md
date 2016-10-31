@@ -10,6 +10,7 @@
 * improve execptions when missing certificates, private_keys or commerce_code, and when set an invalid environment
 * add support for certificates and private key as a files
 * replace specific exceptions by generic exceptions with more detailed explanations
+* add an option for disable the auto acknowledgement on transaction_result method
 
 ### 1.0.3 - 2016-09-15
 

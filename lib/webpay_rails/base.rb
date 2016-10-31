@@ -76,10 +76,13 @@ module WebpayRails
       # === Arguments
       # [:token]
       #   An string that responds Webpay when redirect to +return_url+.
+      # [:ack]
+      #   An optional boolean with which you can disable the auto
+      #   acknowledgement (I guess if you do this, you will know what you do).
       def transaction_result(args)
         response = soap_normal.get_transaction_result(args)
 
-        acknowledge_transaction(token)
+        acknowledge_transaction(args[:token]) if args[:ack] != false
 
         WebpayRails::TransactionResult.new(response)
       end
