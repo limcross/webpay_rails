@@ -100,10 +100,10 @@ When Webpay send customer to `final_url`, we are done. Finally the transaction h
 To cancel a transaction we must use the method described below.
 
 ```ruby
-@transaction = Order.nullify(authorization_code: authorization_code, authorize_amount: authorize_amount, buy_order: buy_order, nullify_amount: nullify_amount)
+@transaction = Order.nullify(authorization_code: authorization_code, authorized_amount: authorized_amount, buy_order: buy_order, nullify_amount: nullify_amount)
 ```
 
-Where `authorization_code`, `authorize_amount`, `buy_order`, are known and corresponds to the transaction to be canceled, and `nullify_amount` it corresponds to the amount to be canceled.
+Where `authorization_code`, `authorized_amount`, `buy_order`, are known and corresponds to the transaction to be canceled, and `nullify_amount` it corresponds to the amount to be canceled.
 
 This method return a `TransactionNullified` object, that contain an `token`, `authorization_code`, `authorization_date`, `balance` and
  `nullified_amount`.

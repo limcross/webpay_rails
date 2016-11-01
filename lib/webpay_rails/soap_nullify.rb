@@ -19,11 +19,13 @@ module WebpayRails
 
     def nullify_message(args)
       {
-        authorizationCode: args[:authorization_code],
-        authorizeAmount: args[:authorize_amount],
-        buyOrder: args[:buy_order],
-        commerceCode: @commerce_code,
-        nullifyAmount: args[:nullify_amount]
+        nullificationInput: {
+          authorizationCode: args[:authorization_code],
+          authorizedAmount: args[:authorized_amount],
+          buyOrder: args[:buy_order],
+          commerceId: @commerce_code,
+          nullifyAmount: args[:nullify_amount]
+        }
       }
     end
   end
