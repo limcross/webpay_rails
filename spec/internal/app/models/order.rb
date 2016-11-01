@@ -10,4 +10,6 @@ class Order < ActiveRecord::Base
 
   enum status: [:created, :approved, :failed, :canceled, :expired, :pending,
                 :refunded]
+
+  scope :approved, -> { where(status: Order.statuses[:approved]) }
 end

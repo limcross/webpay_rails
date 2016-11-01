@@ -26,7 +26,7 @@ describe WebpayRails do
   end
 
   describe WebpayRails::Transaction do
-    describe 'when all is ok' do
+    context 'when all is ok' do
       let(:transaction) { Order.init_transaction(init_transaction_params) }
 
       it { expect(transaction).to be_kind_of(WebpayRails::Transaction) }
@@ -44,7 +44,7 @@ describe WebpayRails do
       end
     end
 
-    describe 'when not' do
+    context 'when not' do
       it { expect { Order.init_transaction(init_transaction_params.merge(return_url: '', final_url: '')) }.to raise_error(WebpayRails::RequestFailed) }
       it { expect { Order.init_transaction(init_transaction_params.merge(amount: 0)) }.to raise_error(WebpayRails::RequestFailed) }
       it { expect { OrderInvalid.init_transaction(init_transaction_params) }.to raise_error(WebpayRails::InvalidCertificate) }
@@ -52,11 +52,72 @@ describe WebpayRails do
   end
 
   describe WebpayRails::TransactionResult do
-    pending 'comming soon'
-  end
+    context 'when all is ok' do
+      describe '.buy_order' do
+        pending 'should not be blank'
+      end
 
-  describe WebpayRails::TransactionNullified do
-    pending 'comming soon'
+      describe '.session_id' do
+        # pending 'should not be blank' NOTE: In fact it can
+      end
+
+      describe '.accounting_date' do
+        pending 'should not be blank'
+      end
+
+      describe '.transaction_date' do
+        pending 'should not be blank'
+      end
+
+      describe '.vci' do
+        pending 'should not be blank'
+      end
+
+      describe '.url_redirection' do
+        pending 'should not be blank'
+      end
+
+      describe '.card_number' do
+        pending 'should not be blank'
+      end
+
+      describe '.card_expiration_date' do
+        # pending 'should not be blank' NOTE: In fact Webpay returns blank
+      end
+
+      describe '.authorization_code' do
+        pending 'should not be blank'
+      end
+
+      describe '.payment_type_code' do
+        pending 'should not be blank'
+      end
+
+      describe '.response_code' do
+        pending 'should not be blank'
+      end
+
+      describe '.amount' do
+        pending 'should not be blank'
+      end
+
+      describe '.shares_number' do
+        pending 'should not be blank'
+      end
+
+      describe '.commerce_code' do
+        pending 'should not be blank'
+      end
+
+      describe '.approved?' do
+        pending 'should be truthy'
+      end
+    end
+
+    context 'when not' do
+      it { expect { Order.init_transaction(token: 'asd') }.to raise_error(WebpayRails::RequestFailed) }
+      pending 'should raise WebpayRails::InvalidCertificate'
+    end
   end
 
   describe 'Normal debit payment flow' do
@@ -138,6 +199,46 @@ describe WebpayRails do
         # Rails app
         expect(page).to have_content('Failed transaction')
       end
+    end
+  end
+
+  describe WebpayRails::TransactionNullified do
+    let(:approved_order) { Order.approved.first! }
+    let(:nullify_params) do
+      { authorization_code: approved_order.tbk_authorization_code,
+        authorized_amount: approved_order.amount,
+        buy_order: approved_order.tbk_buy_order,
+        nullify_amount: approved_order.amount / 2 }
+    end
+
+    context 'when all is ok' do
+      describe '.token' do
+        pending 'should not be blank'
+      end
+
+      describe '.authorization_code' do
+        pending 'should not be blank'
+      end
+
+      describe '.authorization_date' do
+        pending 'should not be blank'
+      end
+
+      describe '.balance' do
+        pending 'should not be blank'
+      end
+
+      describe '.nullified_amount' do
+        pending 'should not be blank'
+      end
+
+      # FIXME the transaction is not found ¯\_(ツ)_/¯
+      # it { expect(Order.nullify(nullify_params)).to be_kind_of(WebpayRails::TransactionNullified) }
+    end
+
+    context 'when not' do
+      it { expect { Order.nullify(nullify_params.merge(nullify_amount: 0)) }.to raise_error(WebpayRails::RequestFailed) }
+      pending 'should raise WebpayRails::InvalidCertificate'
     end
   end
 end
