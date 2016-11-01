@@ -6,5 +6,7 @@ rvm:
   - 2.3.0
 env:
   - CAPYBARA_DRIVER=poltergeist
+after_success:
+  - coveralls
 notifications:
   email: false

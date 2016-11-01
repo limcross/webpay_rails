@@ -25,6 +25,10 @@ else
 end
 Capybara.default_max_wait_time = 10
 
+require 'coveralls'
+
+Coveralls.wear!
+
 require 'webpay_rails'
 
 RSpec.configure do |config|
