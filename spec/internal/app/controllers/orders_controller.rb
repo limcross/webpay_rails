@@ -1,5 +1,6 @@
 class OrdersController < ActionController::Base
   before_action :find_order, only: [:return, :final]
+  before_action :verify_order, only: :return
 
   def new
     @order = Order.new
