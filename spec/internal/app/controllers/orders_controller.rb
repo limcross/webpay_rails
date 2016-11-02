@@ -98,7 +98,7 @@ class OrdersController < ActionController::Base
   def init_transaction_params
     {
       amount: @order.amount,
-      buy_order: @order.id,
+      buy_order: @order.buy_order_for_transbank,
       session_id: session.id,
       return_url: url_for(action: :return, id: @order.id),
       final_url: url_for(action: :final, id: @order.id)

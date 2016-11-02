@@ -1,4 +1,5 @@
 class Order < ActiveRecord::Base
+  include UniversallyUniqueIdentifiable
   extend WebpayRails
 
   webpay_rails(
@@ -12,4 +13,5 @@ class Order < ActiveRecord::Base
                 :refunded]
 
   scope :approved, -> { where(status: Order.statuses[:approved]) }
+  scope :normal_selling, -> { where(tbk_payment_type_code: 'VN') }
 end

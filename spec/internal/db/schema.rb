@@ -1,5 +1,6 @@
 ActiveRecord::Schema.define do
   create_table(:orders, force: true) do |t|
+    t.string :uuid
     t.string :tbk_token_ws, index: true
     t.string :tbk_accounting_date
     t.string :tbk_buy_order

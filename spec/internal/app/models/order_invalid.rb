@@ -1,4 +1,5 @@
 class OrderInvalid < ActiveRecord::Base
+  include UniversallyUniqueIdentifiable
   extend WebpayRails
 
   webpay_rails(
