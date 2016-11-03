@@ -1,5 +1,7 @@
 ### Unreleased
 
+### 1.1.0 - 2016-11-03
+
 #### bug fixes
 * fix response verification
 
