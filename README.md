@@ -41,7 +41,7 @@ class Order < ActiveRecord::Base
 ...
 -----END CERTIFICATE-----',
     environment: :integration,
-    log: Rails.env.development?
+    log: "log/webpay.log"
   )
 end
 ```
