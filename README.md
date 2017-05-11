@@ -12,7 +12,7 @@ _This gem (including certificates used in tests) was originally based on the SDK
 
 ## Getting started
 
-__This README is only valid for the *master* branch, click [here](https://github.com/limcross/webpay_rails/blob/v1.1.0/README.md) for see the latest released version.__
+__This README is only valid for the *master* branch, click [here](https://github.com/limcross/webpay_rails/blob/v1.1.1/README.md) for see the latest released version.__
 
 You can add it to your `Gemfile`:
 
