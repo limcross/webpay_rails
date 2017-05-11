@@ -25,7 +25,7 @@ module WebpayRails
   autoload :Base, 'webpay_rails/base'
 
   class << self
-    attr_accessor :logger
+    attr_accessor :rails_logger
   end
 
   def self.extended(base)

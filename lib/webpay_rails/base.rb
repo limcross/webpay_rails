@@ -20,7 +20,7 @@ module WebpayRails
       #   ...
       #   -----END CERTIFICATE-----',
       #     environment: :integration,
-      #     log: "log/webpay.log"
+      #     log: true
       #   )
       #
       #   # setup with certificates and private_key files
@@ -30,7 +30,7 @@ module WebpayRails
       #     public_cert: 'absolute/path/to/public_cert.crt',
       #     webpay_cert: 'absolute/path/to/webpay_cert.crt',
       #     environment: :integration,
-      #     log: "log/webpay.log"
+      #     log: true
       #   )
       def webpay_rails(args)
         class_attribute :vault, :soap_normal, :soap_nullify,

@@ -13,8 +13,8 @@ module WebpayRails
         raise WebpayRails::InvalidEnvironment
       end
 
-      self.class.client(wsdl: wsdl_path, log: true,
-                        logger: args[:log] ? Logger.new(args[:log]) : WebpayRails.logger)
+      self.class.client(wsdl: wsdl_path, log: args[:log] || true,
+                        logger: file_logger.extend(rails_logger))
     end
 
     private
@@ -73,6 +73,14 @@ module WebpayRails
 
     def valid_environments
       [:production, :certification, :integration]
+    end
+
+    def rails_logger
+      ActiveSupport::Logger.broadcast(WebpayRails.rails_logger)
+    end
+
+    def file_logger
+      Logger.new(Rails.root.join("log/webpay_#{@commerce_code}.log"))
     end
   end
 end
