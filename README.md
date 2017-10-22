@@ -50,7 +50,7 @@ As you can see for `private_key`, `public_cert`, and `webpay_cert`, the content 
 
 The default `environment` is `:integration`, and the valid environments are `:integration`, `:certification` and `:production`. Depending on the environment is assigned the wsdl path.
 
-The `log` is very useful when generating the evidence of integration, and is enabled by default. The log can be found both in the rails log and in a separate file for each trade code (`log\webpay_123456789.log`).
+The `log` is very useful when generating the evidence of integration, and is enabled by default. The log can be found both in the rails log and in a separate file (`log\webpay.log`).
 
 Obviously all these values should not be defined directly in the model. It is strongly recommended to use environment variables for this ([dotenv](https://github.com/bkeepers/dotenv)).
 

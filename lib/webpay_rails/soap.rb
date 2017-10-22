@@ -80,7 +80,7 @@ module WebpayRails
     end
 
     def file_logger
-      Logger.new(Rails.root.join("log/webpay_#{@commerce_code}.log"))
+      Logger.new(Rails.root.join("log/webpay.log"))
     end
   end
 end
