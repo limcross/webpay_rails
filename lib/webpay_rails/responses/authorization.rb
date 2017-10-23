@@ -6,5 +6,9 @@ module WebpayRails::Responses
     end
 
     attr_accessor(*attr_list)
+
+    def success?
+      response_code.to_i.zero?
+    end
   end
 end

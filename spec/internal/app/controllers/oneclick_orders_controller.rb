@@ -7,9 +7,12 @@ class OneclickOrdersController < ActionController::Base
     @user = User.first!
     @order = Order::Oneclick.create!(create_params)
     @response = Order::Oneclick.authorize(authorize_params)
-    @order.update!(update_params)
-
-    render :success
+    if @response.success?
+      @order.update!(update_params)
+      render :success
+    else
+      render :failed
+    end
   rescue WebpayRails::SoapError
     render :failed
   end
