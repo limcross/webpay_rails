@@ -1,4 +1,4 @@
-<%= form_tag(@url, method: @method, style: 'display: none;', id: 'gatewayForm') do %>
+<%= form_tag(@url, method: @method, style: 'display: none;', id: 'gatewayForm', enforce_utf8: false, authenticity_token: false) do %>
   <%= hidden_field_tag(:TBK_TOKEN, @token) %>
   <%= submit_tag("Continuar a webpay") %>
 <% end %>
