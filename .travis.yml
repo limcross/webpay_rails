@@ -1,6 +1,12 @@
 language: ruby
 sudo: false
 cache: bundler
+addons:
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
 rvm:
   - 2.2.2
   - 2.3.0
