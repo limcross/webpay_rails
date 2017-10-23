@@ -5,7 +5,7 @@ rvm:
   - 2.2.2
   - 2.3.0
 env:
-  - CAPYBARA_DRIVER=poltergeist
+  - CAPYBARA_DRIVER=headless_chrome
 after_success:
   - coveralls
 notifications:
