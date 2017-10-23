@@ -8,8 +8,4 @@ module UniversallyUniqueIdentifiable
   def set_uuid
     assign_attributes(uuid: SecureRandom.uuid)
   end
-
-  def buy_order_for_transbank
-    uuid.first(30).delete!('-')
-  end
 end

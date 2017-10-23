@@ -1,5 +1,5 @@
-module WebpayRails
-  class TransactionResult < TransactionBase
+module WebpayRails::Responses
+  class TransactionResult < WebpayRails::Response
     def self.attr_list
       [
         :buy_order, :session_id, :accounting_date, :transaction_date, :vci,
@@ -14,14 +14,10 @@ module WebpayRails
       ]
     end
 
+    attr_accessor(*attr_list)
+
     def approved?
       response_code.to_i.zero?
     end
-
-    attr_reader(*attr_list)
-
-    private
-
-    attr_writer(*attr_list)
   end
 end

@@ -1,6 +1,9 @@
-class OrderInvalid < ActiveRecord::Base
-  include UniversallyUniqueIdentifiable
+class Order::NormalInvalid < ActiveRecord::Base
   extend WebpayRails
+  include Orderable
+  include UniversallyUniqueIdentifiable
+
+  self.table_name = 'orders'
 
   webpay_rails(
     commerce_code: 597020000541,
@@ -8,7 +11,4 @@ class OrderInvalid < ActiveRecord::Base
     public_cert: Rails.root.join('vendor/vault/597020000541.crt').to_s,
     webpay_cert: Rails.root.join('vendor/vault/597020000541.crt').to_s
   )
-
-  enum status: [:created, :approved, :failed, :canceled, :expired, :pending,
-                :refunded]
 end

@@ -1,0 +1,7 @@
+<h1>Form</h1>
+
+<%= form_for @user, url: url_for(action: :create, controller: :oneclick_inscriptions) do |f| %>
+  <%= f.text_field :email %>
+  <%= f.text_field :username %>
+  <%= f.submit 'Inscribe' %>
+<% end %>

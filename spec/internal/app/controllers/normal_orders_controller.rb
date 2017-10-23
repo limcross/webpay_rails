@@ -1,13 +1,13 @@
-class OrdersController < ActionController::Base
+class NormalOrdersController < ActionController::Base
   before_action :find_order, only: [:return, :final]
   before_action :verify_order, only: :return
 
   def new
-    @order = Order.new
+    @order = Order::Normal.new
   end
 
   def create
-    @order = Order.new(create_params)
+    @order = Order::Normal.new(create_params)
 
     if @order.save
       if init_transaction
@@ -45,11 +45,11 @@ class OrdersController < ActionController::Base
   private
 
   def find_order
-    @order = Order.find(params[:id])
+    @order = Order::Normal.find(params[:id])
   end
 
   def create_params
-    params.require(:order).permit(:amount)
+    params.require(:order_normal).permit(:amount)
   end
 
   def update_params
@@ -76,7 +76,7 @@ class OrdersController < ActionController::Base
   end
 
   def init_transaction
-    transaction = Order.init_transaction(init_transaction_params)
+    transaction = Order::Normal.init_transaction(init_transaction_params)
     if transaction.success?
       @method = :post
       @url = transaction.url
@@ -89,7 +89,7 @@ class OrdersController < ActionController::Base
   end
 
   def transaction_result
-    @result = Order.transaction_result(token: params[:token_ws])
+    @result = Order::Normal.transaction_result(token: params[:token_ws])
     true
   rescue WebpayRails::SoapError
     false
@@ -98,7 +98,7 @@ class OrdersController < ActionController::Base
   def init_transaction_params
     {
       amount: @order.amount,
-      buy_order: @order.buy_order_for_transbank,
+      buy_order: @order.buy_order_for_transbank_normal,
       session_id: session.id,
       return_url: url_for(action: :return, id: @order.id),
       final_url: url_for(action: :final, id: @order.id)

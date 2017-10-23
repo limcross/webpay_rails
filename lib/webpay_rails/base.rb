@@ -1,7 +1,6 @@
 module WebpayRails
   module Base
     extend ActiveSupport::Concern
-
     module ClassMethods
       # Setup a model for use Webpay Rails.
       #
@@ -33,16 +32,17 @@ module WebpayRails
       #     log: true
       #   )
       def webpay_rails(args)
-        class_attribute :vault, :soap_normal, :soap_nullify,
+        class_attribute :vault, :soap_normal, :soap_nullify, :soap_oneclick,
                         instance_accessor: false
 
         self.vault = args[:vault] = WebpayRails::Vault.new(args)
         self.soap_normal = WebpayRails::SoapNormal.new(args)
         self.soap_nullify = WebpayRails::SoapNullify.new(args)
+        self.soap_oneclick = WebpayRails::SoapOneclick.new(args)
       end
 
       # Initializes a transaction
-      # Returns a WebpayRails::Transaction if successfully initialised.
+      # Returns a WebpayRails::Response::InitTransaction if successfully initialised.
       # If fault a WebpayRails::RequestFailed exception is raised.
       # If the SOAP response cant be verified a WebpayRails::InvalidCertificate
       # exception is raised.
@@ -64,11 +64,11 @@ module WebpayRails
       def init_transaction(args)
         response = soap_normal.init_transaction(args)
 
-        WebpayRails::Transaction.new(response)
+        WebpayRails::Responses::InitTransaction.new(response)
       end
 
       # Retrieves the result of a transaction
-      # Returns a WebpayRails::TransactionResult if successfully get a response.
+      # Returns a WebpayRails::Response::TransactionResult if successfully get a response.
       # If fault a WebpayRails::RequestFailed exception is raised.
       # If the SOAP response cant be verified a WebpayRails::InvalidCertificate
       # exception is raised.
@@ -84,7 +84,7 @@ module WebpayRails
 
         acknowledge_transaction(args) if args[:ack] != false
 
-        WebpayRails::TransactionResult.new(response)
+        WebpayRails::Responses::TransactionResult.new(response)
       end
 
       # Reports the correct reception of the result of the transaction
@@ -103,7 +103,7 @@ module WebpayRails
       end
 
       # Nullify a transaction
-      # Returns a WebpayRails::TransactionNullified if successfully initialised.
+      # Returns a WebpayRails::Response::TransactionNullify if successfully initialised.
       # If fault a WebpayRails::RequestFailed exception is raised.
       # If the SOAP response cant be verified a WebpayRails::InvalidCertificate
       # exception is raised.
@@ -121,7 +121,37 @@ module WebpayRails
       def nullify(args)
         response = soap_nullify.nullify(args)
 
-        WebpayRails::TransactionNullified.new(response)
+        WebpayRails::Responses::TransactionNullify.new(response)
+      end
+
+      def init_inscription(args)
+        response = soap_oneclick.init_inscription(args)
+
+        WebpayRails::Responses::InitInscription.new(response)
+      end
+
+      def finish_inscription(args)
+        response = soap_oneclick.finish_inscription(args)
+
+        WebpayRails::Responses::FinishInscription.new(response)
+      end
+
+      def authorize(args)
+        response = soap_oneclick.authorize(args)
+
+        WebpayRails::Responses::Authorization.new(response)
+      end
+
+      def reverse(args)
+        response = soap_oneclick.reverse(args)
+
+        WebpayRails::Response.new(response)
+      end
+
+      def remove_user(args)
+        response = soap_oneclick.remove_user(args)
+
+        WebpayRails::Response.new(response)
       end
     end
   end

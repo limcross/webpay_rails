@@ -13,15 +13,16 @@ if ENV['CAPYBARA_DRIVER'].try(:to_sym) == :poltergeist
   require 'capybara/poltergeist'
   Capybara.default_driver = :poltergeist
 else
-  Capybara.register_driver :selenium do |app|
-    Capybara::Selenium::Driver.new(
-      app,
-      browser: :firefox,
-      desired_capabilities: Selenium::WebDriver::Remote::Capabilities.firefox(marionette: false)
+  Capybara.register_driver :chrome do |app|
+    capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
+      chromeOptions: { args: %w[window-size=1024,768] }
     )
+
+    Capybara::Selenium::Driver.new app, browser: :chrome,
+                                        desired_capabilities: capabilities
   end
 
-  Capybara.default_driver = :selenium
+  Capybara.default_driver = :chrome
 end
 Capybara.default_max_wait_time = 10
 
