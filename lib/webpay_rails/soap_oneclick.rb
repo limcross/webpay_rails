@@ -75,10 +75,10 @@ module WebpayRails
       }
     end
 
-    def reverse(args)
+    def reverse_message(args)
       {
         arg0: {
-          buyOrder: args[:buy_order]
+          buyorder: args[:buy_order]
         }
       }
     end

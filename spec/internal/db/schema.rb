@@ -16,7 +16,6 @@ ActiveRecord::Schema.define do
     t.string :tbk_shares_number
 
     t.string :tbk_transaction_id
-    t.string :tbk_last_4_card_digits
     t.string :tbk_credit_card_type
 
     t.integer :amount

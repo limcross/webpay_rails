@@ -23,6 +23,8 @@ require 'webpay_rails/responses/transaction_nullify'
 require 'webpay_rails/responses/init_inscription'
 require 'webpay_rails/responses/finish_inscription'
 require 'webpay_rails/responses/authorization'
+require 'webpay_rails/responses/reverse'
+require 'webpay_rails/responses/remove_user'
 require 'webpay_rails/railites'
 
 module WebpayRails

@@ -1,7 +1,7 @@
 module WebpayRails
   class Response
     def self.attr_list
-      [:response]
+      []
     end
 
     def initialize(response)

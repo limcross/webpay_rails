@@ -145,13 +145,13 @@ module WebpayRails
       def reverse(args)
         response = soap_oneclick.reverse(args)
 
-        WebpayRails::Response.new(response)
+        WebpayRails::Responses::Reverse.new(response)
       end
 
       def remove_user(args)
         response = soap_oneclick.remove_user(args)
 
-        WebpayRails::Response.new(response)
+        WebpayRails::Responses::RemoveUser.new(response)
       end
     end
   end

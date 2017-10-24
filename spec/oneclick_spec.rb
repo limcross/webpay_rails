@@ -1,54 +1,6 @@
 require 'spec_helper'
 require 'vault_helper'
 
-describe WebpayRails::Responses::InitInscription do
-  let(:email) { 'john.doe@mail.com' }
-  let(:username) { 'john' }
-  let(:return_url) { 'http://localhost:3000/tbkonclick?option=return' }
-  let!(:init_inscription_params) { { email: email, username: username, return_url: return_url } }
-
-  context 'when all is ok' do
-    let!(:inscription) { Order::Oneclick.init_inscription(init_inscription_params) }
-
-    it { expect(inscription).to be_kind_of(WebpayRails::Responses::InitInscription) }
-
-    describe '.token' do
-      it { expect(inscription.token).not_to be_blank }
-    end
-
-    describe '.url_webpay' do
-      it { expect(inscription.url_webpay).not_to be_blank }
-    end
-  end
-
-  context 'when not' do
-    it { expect { Order::Oneclick.init_inscription(init_inscription_params.merge(return_url: '')) }.to raise_error(WebpayRails::RequestFailed) }
-    pending 'should raise WebpayRails::InvalidCertificate'
-  end
-end
-
-
-describe WebpayRails::Responses::Authorization do
-  context 'when all is ok' do
-    #before(:all) { @inscription = Order::Oneclick.finish_inscription({ token: '' }) }
-    #before(:all) { @authorization = Order::Oneclick.authorize({ username: '', tbk_user: '', amount: 0, order_id: '' }) }
-
-    describe '.token' do
-      pending 'should not be blank'
-    end
-
-    describe '.url' do
-      pending 'should not be blank'
-    end
-  end
-
-  context 'when not' do
-    it { expect { Order::Oneclick.finish_inscription({ token: 'asd' }) }.to raise_error(WebpayRails::RequestFailed) }
-    it { expect { Order::Oneclick.authorize({ username: '', tbk_user: '', amount: 0, order_id: '' }) }.to raise_error(WebpayRails::RequestFailed) }
-    pending 'should raise WebpayRails::InvalidCertificate'
-  end
-end
-
 describe 'Inscription flow' do
   let(:email) { 'john.doe@mail.com' }
   let(:username) { 'john' }
@@ -116,10 +68,7 @@ describe 'Inscription flow' do
   end
 end
 
-describe 'Oneclick order flow' do
-  let(:email) { 'john.doe@mail.com' }
-  let(:username) { 'john' }
-
+describe 'Authorization flow' do
   before(:each) { visit new_oneclick_order_path }
 
   context 'when it accepted' do
@@ -134,5 +83,46 @@ describe 'Oneclick order flow' do
       # Rails app
       expect(page).to have_content('Success transaction')
     end
+  end
+end
+
+describe 'Reverse order' do
+  before(:all) { @buy_order = Order::Oneclick.approved.last!.buy_order_for_transbank_oneclick }
+
+  context 'when all is ok' do
+    before(:all) { @result = Order::Oneclick.reverse(buy_order: @buy_order) }
+
+    it { expect(@result).to be_kind_of(WebpayRails::Responses::Reverse) }
+    it { expect(@result.success?).to be_truthy }
+
+    describe '.return' do
+      it { expect(@result.return).not_to be_blank }
+    end
+  end
+
+  context 'when not' do
+    it { expect { Order::Oneclick.reverse(buy_order: '') }.to raise_error(WebpayRails::RequestFailed) }
+    pending 'should raise WebpayRails::InvalidCertificate'
+  end
+end
+
+describe 'Unsubscribe' do
+  before(:all) { @tbk_user = User.first!.tbk_user }
+  before(:all) { @username = 'john' }
+
+  context 'when all is ok' do
+    before(:all) { @result = Order::Oneclick.remove_user(tbk_user: @tbk_user, username: @username) }
+
+    it { expect(@result).to be_kind_of(WebpayRails::Responses::RemoveUser) }
+    it { expect(@result.success?).to be_truthy }
+
+    describe '.return' do
+      it { expect(@result.return).not_to be_blank }
+    end
+  end
+
+  context 'when not' do
+    it { expect { Order::Oneclick.remove_user(tbk_user: '', username: @username) }.to raise_error(WebpayRails::RequestFailed) }
+    pending 'should raise WebpayRails::InvalidCertificate'
   end
 end
