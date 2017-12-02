@@ -39,5 +39,5 @@ Coveralls.wear!
 require 'webpay_rails'
 
 RSpec.configure do |config|
-  config.use_transactional_fixtures = true
+  config.use_transactional_fixtures = false
 end
