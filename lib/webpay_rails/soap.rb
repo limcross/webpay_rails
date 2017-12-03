@@ -14,7 +14,8 @@ module WebpayRails
       end
 
       self.class.client(wsdl: wsdl_path, log: args[:log] || true,
-                        logger: file_logger.extend(rails_logger))
+                        logger: file_logger.extend(rails_logger),
+                        open_timeout: 15, read_timeout: 15)
     end
 
     private
