@@ -13,8 +13,12 @@ module WebpayRails
         raise WebpayRails::InvalidEnvironment
       end
 
-      self.class.client(wsdl: wsdl_path, log: args[:log] || true,
-                        logger: file_logger.extend(rails_logger))
+      if args[:log]
+        self.class.client(wsdl: wsdl_path, log: true,
+                          logger: file_logger.extend(rails_logger))
+      else
+        self.class.client(wsdl: wsdl_path, log: false)
+      end
     end
 
     private
