@@ -10,6 +10,12 @@ WebpayRails is an easy solution for integrate Transbank Webpay in Rails applicat
 
 _This gem (including certificates used in tests) was originally based on the SDK for Ruby (distributed under the **open source license**) available in www.transbankdevelopers.cl_
 
+### WebpayRails has been Deprecated
+
+__Transbank no longer supports SOAP integration. This repository has been deprecated and will no longer be maintained.__
+
+You should consider using the official gem [transbank-sdk-ruby](https://github.com/TransbankDevelopers/transbank-sdk-ruby).
+
 ## Getting started
 
 __This README is only valid for the *master* branch, click [here](https://github.com/limcross/webpay_rails/blob/v1.1.1/README.md) for see the latest released version.__
